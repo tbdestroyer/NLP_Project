@@ -4,15 +4,15 @@ NLP Project setup tracker and team working document.
 
 ## 1) Team
 
-- Taner Bulbul - Developer, Product Coordinator
-- Ayesha Khan - Developer, Data Lead
-- Shantanu Ramavat - Developer, Modeling Lead
-- Random Teammate - Developer, Evaluation Lead
-- Random Teammate - Developer, QA Lead
+- Taner Bulbul - Developer, Product
+- Ayesha Khan - Developer, Data and Evaluation
+- Shantanu Ramavat - Developer, Engineering
+- Random Teammate - Developer, Users and Research
+- Random Teammate - Developer, Operations
 
 ## 2) Company Name
 
-Placeholder company name: **Terrapin Analytics**
+Company name: **ScholarShell**
 
 ## 3) Problem Statement
 
