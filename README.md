@@ -1,4 +1,4 @@
-# Terrapin Analytics
+# ScholarShell
 
 NLP Project setup tracker and team working document.
 
