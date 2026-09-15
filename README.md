@@ -22,8 +22,8 @@ We help students summarize long research articles faster than reading full paper
 
 Required settings:
 
-- Require a pull request before merging: [Yes/No]
-- Require one approving review: [Yes/No]
+- Require a pull request before merging
+- Require one approving review
 
 - [ ] Team finalized (4 or 5 confirmed named teammates)
 - [x] Roles/hats assigned (one each)
