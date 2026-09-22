@@ -9,7 +9,7 @@
 | Name | Email | GitHub Username | Role |
 |---|---|---|---|
 | Taner Bulbul | tbulbul@umd.edu |  tbdestroyer | Product Lead / Developer
-| Ayesha Khan | ayekhan@umd.edu | | |
+| Ayesha Khan | ayekhan@umd.edu | ayekhan12 | |
 | Namratha | namrath4@umd.edu | | |
 | Shantanu Ramavat | sramavat@umd.edu | | |
 | Vaibhav Devarapalli | gdevarap@umd.edu | | |
