@@ -16,7 +16,7 @@
 
 ## 1. Shipped This Week
 
-### Project Idea: 
+### Proposed Project Idea: 
 Predicting Sentiment Inflection Points in Conversational AI (Chatbots)
 
 While customer chatbots are widespread, poor conversational flow drives user churn. This project models dialogue sentiment trajectories to detect critical inflection points where customer sentiment turns negative. By isolating specific triggers—such as intent misclassifications and circular routing—our framework automates failure diagnosis and enables proactive agent escalation.
@@ -35,15 +35,19 @@ While customer chatbots are widespread, poor conversational flow drives user chu
 
 ## 5. Next Week's Goals
 
-
+Review existing research and applications related to conversational sentiment analysis, negative sentiment prediction, and chatbot failure detection to identify potential gaps and opportunities for our project.
+Investigate available conversational datasets and evaluate their suitability for sentiment trajectory modeling and early prediction.
+Compare alternative project scopes, including sentiment change detection, early frustration prediction, and chatbot failure diagnosis.
+Test a preliminary sentiment analysis model on sample conversations to assess technical feasibility.
+Finalize a focused research question, initial evaluation approach, and minimum viable product based on our findings.
 
 ## 6. Individual Contributions
 
 ### Taner Bulbul
 
-**Contributions:**
+**Contributions:** Organized Github weekly report file and group meeting. Facilitated project ideas, asked questions to understand everyone's experience, interests and land on a project idea, facilitated the conversation to collectively understand what we need to complete for this week and by next. 
 
-**GitHub Evidence:**
+**GitHub Evidence:** Commit Codes: c11c500, d084d48
 
 ### Ayesha Khan
 
