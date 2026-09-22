@@ -16,7 +16,10 @@
 
 ## 1. Shipped This Week
 
+### Project Idea: 
+Predicting Sentiment Inflection Points in Conversational AI (Chatbots)
 
+While customer chatbots are widespread, poor conversational flow drives user churn. This project models dialogue sentiment trajectories to detect critical inflection points where customer sentiment turns negative. By isolating specific triggers—such as intent misclassifications and circular routing—our framework automates failure diagnosis and enables proactive agent escalation.
 
 ## 2. User / Validation Learning
 
@@ -44,9 +47,9 @@
 
 ### Ayesha Khan
 
-**Contributions:**
+**Contributions:** During our brainstorming session, I proposed two concepts: a RAG system to centralize program registration documents for students, and a project focused on predicting sentiment inflection points in conversational AI. The team chose to move forward with the sentiment inflection project. Next, I will evaluate its technical feasibility and scope before we fully lock it in.
 
-**GitHub Evidence:**
+**GitHub Evidence:** Added and committed these updates to this GitHub report.
 
 ### Namratha
 
