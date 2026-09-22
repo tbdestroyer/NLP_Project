@@ -51,7 +51,7 @@ Finalize a focused research question, initial evaluation approach, and minimum v
 
 ### Ayesha Khan
 
-**Contributions:** During our brainstorming session, I proposed two concepts: a RAG system to centralize program registration documents for students, and a project focused on predicting sentiment inflection points in conversational AI. The team chose to move forward with the sentiment inflection project. Next, I will evaluate its technical feasibility and scope before we fully lock it in.
+**Contributions:** During our brainstorming session, I proposed two concepts: a RAG system to centralize program registration documents for students, and a project focused on predicting sentiment inflection points in conversational AI. The team chose to move forward with the sentiment inflection project. Next, we will evaluate its technical feasibility and scope before we fully lock it in.
 
 **GitHub Evidence:** Added and committed these updates to this GitHub report.
 
