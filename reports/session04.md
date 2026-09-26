@@ -10,7 +10,7 @@
 |---|---|---|---|
 | Taner Bulbul | tbulbul@umd.edu |  tbdestroyer | Product Lead / Developer
 | Ayesha Khan | ayekhan@umd.edu | ayekhan12 | |
-| Namratha Jeetendra | namrath4@umd.edu | | namrathajeetendra |
+| Namratha Jeetendra | namrath4@umd.edu | namrathajeetendra |  |
 | Shantanu Ramavat | sramavat@umd.edu | | |
 | Vaibhav Devarapalli | gdevarap@umd.edu | | |
 
