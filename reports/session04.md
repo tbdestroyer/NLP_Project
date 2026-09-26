@@ -10,7 +10,7 @@
 |---|---|---|---|
 | Taner Bulbul | tbulbul@umd.edu |  tbdestroyer | Product Lead / Developer
 | Ayesha Khan | ayekhan@umd.edu | ayekhan12 | |
-| Namratha | namrath4@umd.edu | | |
+| Namratha Jeetendra | namrath4@umd.edu | | namrathajeetendra |
 | Shantanu Ramavat | sramavat@umd.edu | | |
 | Vaibhav Devarapalli | gdevarap@umd.edu | | |
 
@@ -57,7 +57,7 @@ Finalize a focused research question, initial evaluation approach, and minimum v
 
 ### Namratha
 
-**Contributions:**
+**Contributions:** Shared insights from my previous projects worked during my undergrad in the meeting to help narrow down on a project topic. We tentatively settled on the sentiment infliction project for now and have agreed to brainstorm further before the next meeting to finalize on the topic.
 
 **GitHub Evidence:**
 
