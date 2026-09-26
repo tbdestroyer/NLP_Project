@@ -59,7 +59,7 @@ Finalize a focused research question, initial evaluation approach, and minimum v
 
 **Contributions:** Shared insights from my previous projects worked during my undergrad in the meeting to help narrow down on a project topic. We tentatively settled on the sentiment infliction project for now and have agreed to brainstorm further before the next meeting to finalize on the topic.
 
-**GitHub Evidence:**
+**GitHub Evidence:** Commit Codes: b197d7f, bb2c295
 
 ### Shantanu Ramavat
 
