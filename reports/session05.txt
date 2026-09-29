@@ -1,0 +1,98 @@
+# Weekly Project Report — Week 05
+
+**Team Name:**  
+**Date:** September 29, 2026
+
+## Team Members
+
+| Name | Email | GitHub Username | Role |
+|---|---|---|---|
+| Taner Bulbul | tbulbul@umd.edu | tbdestroyer | Product Lead / Developer |
+| Ayesha Khan | ayekhan@umd.edu | ayekhan12 | |
+| Namratha Jeetendra | namrath4@umd.edu | namrathajeetendra | |
+| Shantanu Ramavat | sramavat@umd.edu | | |
+| Vaibhav Devarapalli | gdevarap@umd.edu | | |
+
+## 1. Shipped This Week
+
+### Proposed Project Idea:
+**Predicting Sentiment Inflection Points in Conversational AI (Chatbots)**
+
+While customer chatbots are widespread, poor conversational flow can lead to user frustration and abandonment. This project models dialogue sentiment trajectories to identify critical inflection points where customer sentiment turns negative. Potential extensions include identifying conversational failures such as intent misclassification or circular routing and determining when escalation to a human agent may be appropriate.
+
+### Project Research / Feasibility
+
+- Reviewed existing research and applications related to conversational sentiment analysis, negative sentiment prediction, and chatbot failure detection.
+- Investigated whether similar systems already exist and where there may be opportunities to differentiate our project.
+- Considered alternative scopes and variations of the original project idea.
+- Investigated potential datasets and methods for evaluating sentiment changes across multi-turn conversations.
+
+## 2. User / Validation Learning
+
+
+
+## 3. Metrics Snapshot
+
+
+
+## 4. Challenges / Blockers
+
+- Need to determine how novel the proposed project is compared with existing research.
+- Need to identify a suitable multi-turn conversational dataset with useful sentiment or dialogue-quality labels.
+- Need to narrow the project scope so that it is achievable within the semester.
+- Need to decide whether the primary task will be sentiment change detection, early prediction, failure diagnosis, or a combination of these.
+
+## 5. Next Week's Goals
+
+- Finalize the project's primary research question and scope.
+- Select an appropriate conversational dataset.
+- Define the prediction target and evaluation metrics.
+- Establish a simple baseline model for comparison.
+- Begin implementing a small proof-of-concept sentiment analysis pipeline.
+- Define the minimum viable product and divide initial implementation tasks among team members.
+
+## 6. Individual Contributions
+
+### Taner Bulbul
+
+**Contributions:**
+
+**GitHub Evidence:**
+
+### Ayesha Khan
+
+**Contributions:**
+
+**GitHub Evidence:**
+
+### Namratha Jeetendra
+
+**Contributions:**
+
+**GitHub Evidence:**
+
+### Shantanu Ramavat
+
+**Contributions:**
+
+**GitHub Evidence:**
+
+### Vaibhav Devarapalli
+
+**Contributions:**
+
+**GitHub Evidence:**
+
+## 7. Lean Canvas Changes (If Any)
+
+**Problem:**
+
+**Customer Segments:**
+
+**Unique Value Proposition:**
+
+**Proposed Solution:**
+
+**Key Metrics:**
+
+**Changes Since Last Week:**
