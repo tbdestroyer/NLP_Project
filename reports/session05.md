@@ -57,7 +57,7 @@ While customer chatbots are widespread, poor conversational flow can lead to use
 
 **Contributions:**
 Links to papers used for my background research: 
-- **ESD–ERC (2022)** — Emotion shift detection + emotion recognition. [Paper](https://www.sciencedirect.com/science/article/pii/S0950705122004117?utm_source=chatgpt.com)
+- **ESD–ERC (2022)** — Emotion shift detection + emotion recognition. [Paper](https://www.sciencedirect.com/science/article/pii/S0950705122004117?)
 - **EmoShiftNet (2025)** — Multi-task emotion + emotion-shift detection. [Paper](https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2025.1618698/full?utm_source=chatgpt.com)
 - **DialogueRNN (2019)** — Models speaker states and conversational history. [Paper](https://ojs.aaai.org/index.php/AAAI/article/view/4657?utm_source=chatgpt.com)
 - **DialogueGCN (2019)** — Graph-based modeling of speaker/context dependencies. [Paper](https://aclanthology.org/D19-1015/?utm_source=chatgpt.com)
