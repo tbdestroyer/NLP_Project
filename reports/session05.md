@@ -112,7 +112,7 @@ The central hypothesis is that a customer's emotional trajectory contains predic
 - **EmotionLines** — Multi-party conversations with turn-level emotion annotations.
   https://arxiv.org/abs/1802.08379
 
-**GitHub Evidence:** 
+**GitHub Evidence:** 54aa6fe
 
 ## 7. Lean Canvas Changes (If Any)
 
