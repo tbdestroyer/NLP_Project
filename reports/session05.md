@@ -99,9 +99,20 @@ The central hypothesis is that a customer's emotional trajectory contains predic
 
 ### Vaibhav Devarapalli
 
-**Contributions:**
+**Contributions:** I researched potential public datasets that could be used for our project. During the team discussion, we considered whether to use labeled or unlabeled conversational datasets and agreed to move forward with labeled datasets for the project. I then researched and looked into several conversational datasets to identify which ones fit our project's focus on sentiment changes across multi-turn conversations.
 
-**GitHub Evidence:**
+**Dataset Research:**
+
+- **MELD** — Multi-turn conversations with sentiment and emotion labels.
+  https://github.com/declare-lab/MELD
+
+- **DailyDialog** — Multi-turn everyday conversations with emotion and dialogue-act annotations.
+  https://github.com/dialoguesystems/dialogue-datasets/tree/master/dailyDialog
+
+- **EmotionLines** — Multi-party conversations with turn-level emotion annotations.
+  https://arxiv.org/abs/1802.08379
+
+**GitHub Evidence:** 
 
 ## 7. Lean Canvas Changes (If Any)
 
