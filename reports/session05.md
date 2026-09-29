@@ -63,7 +63,7 @@ While customer chatbots are widespread, poor conversational flow can lead to use
 
 **Contributions:** Discussed concerns on the feasibility and potential challenges of performing a "real-life" evaluation for our chosen topic of identifying "sentiment-switching in the midst of a conversation". Next steps for me are to find related research papers.
 
-**GitHub Evidence:**
+**GitHub Evidence:** commit hash: e1f8546
 
 ### Namratha Jeetendra
 
