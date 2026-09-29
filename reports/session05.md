@@ -87,7 +87,7 @@ The central hypothesis is that a customer's emotional trajectory contains predic
 
 ### Namratha Jeetendra
 
-**Contributions:**
+**Contributions:** I took part in our team meeting to define the project's direction and scope. Since we can't evaluate with real users, I proposed an alternative model-based evaluation approach: comparing a baseline model, a fine-tuned model, and a context-aware model on how well they predict sentiment inflection points in customer-support conversations. I also helped outline what the final project will look like so we could lock down its scope, and took part in dividing the remaining tasks across the team.
 
 **GitHub Evidence:**
 
