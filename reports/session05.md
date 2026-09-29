@@ -58,13 +58,13 @@ While customer chatbots are widespread, poor conversational flow can lead to use
 **Contributions:**
 Links to papers used for my background research: 
 - **ESD–ERC (2022)** — Emotion shift detection + emotion recognition. [Paper](https://www.sciencedirect.com/science/article/pii/S0950705122004117?)
-- **EmoShiftNet (2025)** — Multi-task emotion + emotion-shift detection. [Paper](https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2025.1618698/full?utm_source=chatgpt.com)
-- **DialogueRNN (2019)** — Models speaker states and conversational history. [Paper](https://ojs.aaai.org/index.php/AAAI/article/view/4657?utm_source=chatgpt.com)
-- **DialogueGCN (2019)** — Graph-based modeling of speaker/context dependencies. [Paper](https://aclanthology.org/D19-1015/?utm_source=chatgpt.com)
-- **COSMIC (2020)** — Context + commonsense reasoning for conversational emotion. [Paper](https://aclanthology.org/2020.findings-emnlp.224/?utm_source=chatgpt.com)
-- **Shapes of Emotions (2022)** — Explicitly studies emotion shifts in conversation. [Paper](https://aclanthology.org/2022.mmmpie-1.6/?utm_source=chatgpt.com)
-- **DAG-ERC (2021)** — Models short- and long-range conversational dependencies. [Paper](https://aclanthology.org/2021.acl-long.123/?utm_source=chatgpt.com)
-- **MELD (2019)** — Multi-turn dataset with turn-level emotion and sentiment labels. [Paper](https://aclanthology.org/P19-1050/?utm_source=chatgpt.com) · [Dataset/code](https://github.com/declare-lab/MELD?utm_source=chatgpt.com)
+- **EmoShiftNet (2025)** — Multi-task emotion + emotion-shift detection. [Paper](https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2025.1618698/full?)
+- **DialogueRNN (2019)** — Models speaker states and conversational history. [Paper](https://ojs.aaai.org/index.php/AAAI/article/view/4657?)
+- **DialogueGCN (2019)** — Graph-based modeling of speaker/context dependencies. [Paper](https://aclanthology.org/D19-1015/?)
+- **COSMIC (2020)** — Context + commonsense reasoning for conversational emotion. [Paper](https://aclanthology.org/2020.findings-emnlp.224/?)
+- **Shapes of Emotions (2022)** — Explicitly studies emotion shifts in conversation. [Paper](https://aclanthology.org/2022.mmmpie-1.6/?)
+- **DAG-ERC (2021)** — Models short- and long-range conversational dependencies. [Paper](https://aclanthology.org/2021.acl-long.123/?)
+- **MELD (2019)** — Multi-turn dataset with turn-level emotion and sentiment labels. [Paper](https://aclanthology.org/P19-1050/?) · [Dataset/code](https://github.com/declare-lab/MELD?)
 
 Our project develops an early-warning framework for negative sentiment inflection in multi-turn conversational AI. Instead of treating customer sentiment as an independent classification problem for each message, we model how the customer's affect and dialogue state evolve throughout an interaction and ask whether that trajectory predicts an upcoming negative shift.
 We build on prior work on Emotion-Flip Reasoning, which identifies utterances responsible for observed changes in emotion, and TRACER, which demonstrates that dialogue failures can be forecast from partial conversational trajectories. We extend these ideas toward a customer-service setting where the goal is to predict a negative emotional transition before it occurs, rather than only recognize or explain it afterward.
