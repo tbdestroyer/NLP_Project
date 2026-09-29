@@ -66,6 +66,7 @@ Links to papers used for my background research:
 - **DAG-ERC (2021)** — Models short- and long-range conversational dependencies. [Paper](https://aclanthology.org/2021.acl-long.123/?)
 - **MELD (2019)** — Multi-turn dataset with turn-level emotion and sentiment labels. [Paper](https://aclanthology.org/P19-1050/?) · [Dataset/code](https://github.com/declare-lab/MELD?)
 
+Drafting Parts of Proposal for next week after relevant paper and architecture research: 
 Our project develops an early-warning framework for negative sentiment inflection in multi-turn conversational AI. Instead of treating customer sentiment as an independent classification problem for each message, we model how the customer's affect and dialogue state evolve throughout an interaction and ask whether that trajectory predicts an upcoming negative shift.
 We build on prior work on Emotion-Flip Reasoning, which identifies utterances responsible for observed changes in emotion, and TRACER, which demonstrates that dialogue failures can be forecast from partial conversational trajectories. We extend these ideas toward a customer-service setting where the goal is to predict a negative emotional transition before it occurs, rather than only recognize or explain it afterward.
 Our main contributions are:
