@@ -56,26 +56,19 @@ While customer chatbots are widespread, poor conversational flow can lead to use
 ### Taner Bulbul
 
 **Contributions:**
-Links to papers used for my background research: 
-- **ESD–ERC (2022)** — Emotion shift detection + emotion recognition. [Paper](https://www.sciencedirect.com/science/article/pii/S0950705122004117?)
-- **EmoShiftNet (2025)** — Multi-task emotion + emotion-shift detection. [Paper](https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2025.1618698/full?)
-- **DialogueRNN (2019)** — Models speaker states and conversational history. [Paper](https://ojs.aaai.org/index.php/AAAI/article/view/4657?)
-- **DialogueGCN (2019)** — Graph-based modeling of speaker/context dependencies. [Paper](https://aclanthology.org/D19-1015/?)
-- **COSMIC (2020)** — Context + commonsense reasoning for conversational emotion. [Paper](https://aclanthology.org/2020.findings-emnlp.224/?)
-- **Shapes of Emotions (2022)** — Explicitly studies emotion shifts in conversation. [Paper](https://aclanthology.org/2022.mmmpie-1.6/?)
-- **DAG-ERC (2021)** — Models short- and long-range conversational dependencies. [Paper](https://aclanthology.org/2021.acl-long.123/?)
-- **MELD (2019)** — Multi-turn dataset with turn-level emotion and sentiment labels. [Paper](https://aclanthology.org/P19-1050/?) · [Dataset/code](https://github.com/declare-lab/MELD?)
+Updated project scope and links to better match objective after meeting tonight: 
 
-Drafting Parts of Proposal for next week after relevant paper and architecture research: 
-Our project develops an early-warning framework for negative sentiment inflection in multi-turn conversational AI. Instead of treating customer sentiment as an independent classification problem for each message, we model how the customer's affect and dialogue state evolve throughout an interaction and ask whether that trajectory predicts an upcoming negative shift.
-We build on prior work on Emotion-Flip Reasoning, which identifies utterances responsible for observed changes in emotion, and TRACER, which demonstrates that dialogue failures can be forecast from partial conversational trajectories. We extend these ideas toward a customer-service setting where the goal is to predict a negative emotional transition before it occurs, rather than only recognize or explain it afterward.
-Our main contributions are:
- Early sentiment-inflection prediction: We formulate the task as forecasting whether a customer's sentiment will become substantially more negative within a future dialogue window using only the conversation observed so far.
- Trajectory-aware modeling: We combine learned textual representations with temporal signals such as sentiment change, sentiment slope, repeated intents, dialogue-state conflicts, and unresolved interaction patterns, motivated by the dual-stream approach used in TRACER.
- Explainable warning signals: We investigate whether the model can identify the previous utterance or conversational event most strongly associated with an impending or observed sentiment shift, drawing on Emotion-Flip Reasoning and SHARK.
- Customer-service evaluation: We explore transfer to customer-service conversations using the ABCD dataset, with BETOLD providing an additional reference for dialogue breakdown and abandonment-related outcomes.
- Intervention-oriented design: As an extension, predicted risk can be used to trigger clarification, dialogue repair, or human escalation before the conversation fully breaks down, inspired by early-failure forecasting and Detect–Explain–Escalate architectures.
-The central hypothesis is that a customer's emotional trajectory contains predictive information before an explicit negative turn occurs, and that combining that trajectory with the semantic content and structure of the dialogue will provide earlier and more actionable warning signals than classifying individual messages in isolation. This is the hypothesis I would make the centerpiece of the project proposal.
+Our project focuses on early, trajectory-based purchase prediction in sales conversations. Rather than classifying each message independently, we estimate a turn-by-turn Inclination Score representing the customer’s likelihood of eventually purchasing, then detect important increases or drops and analyze what conversational events may have caused them. The most relevant prior work now includes SalesRLAgent for real-time sales conversion prediction, SalesLLM for buying-intent evaluation in sales dialogue, TRACER for forecasting outcomes from partial dialogue trajectories, DialogueRNN for modeling conversational history, and Emotion-Flip Reasoning for identifying utterances associated with behavioral or emotional shifts. For data, the strongest options are SaaS Sales Conversations as the main conversion dataset, Kapibala Sales Dialogues for turn-level purchase-intent validation, and optionally CraigslistBargain or PersuasionForGood for external validation. This better matches the current proposal than the earlier emotion-recognition-heavy literature.   
+Links:
+- SalesRLAgent: https://arxiv.org/abs/2503.23303
+- SalesLLM: https://arxiv.org/abs/2604.07054
+- TRACER: https://arxiv.org/abs/2607.03974
+- DialogueRNN: https://ojs.aaai.org/index.php/AAAI/article/view/4657
+- Emotion-Flip Reasoning: https://arxiv.org/abs/2306.13959
+- SaaS Sales Conversations: https://huggingface.co/datasets/DeepMostInnovations/saas-sales-conversations
+- Kapibala Sales Dialogues: https://huggingface.co/datasets/kapibala-ai/kapibala-sales-dialogues
+- CraigslistBargain: https://huggingface.co/datasets/stanfordnlp/craigslist_bargains
+- PersuasionForGood: https://convokit.cornell.edu/documentation/persuasionforgood.html
 
 **GitHub Evidence:**
 
