@@ -10,7 +10,7 @@
 | Taner Bulbul | tbulbul@umd.edu | tbdestroyer | Product Lead / Developer |
 | Ayesha Khan | ayekhan@umd.edu | ayekhan12 | |
 | Namratha Jeetendra | namrath4@umd.edu | namrathajeetendra | |
-| Shantanu Ramavat | sramavat@umd.edu | | |
+| Shantanu Ramavat | sramavat@umd.edu | sramavat-24 | Software Engineer |
 | Vaibhav Devarapalli | gdevarap@umd.edu | | |
 
 ## 1. Shipped This Week
@@ -93,9 +93,15 @@ The central hypothesis is that a customer's emotional trajectory contains predic
 
 ### Shantanu Ramavat
 
-**Contributions:**
+**Contributions:** I researched additional public datasets to complement the ones my teammate found, focusing on our project's two needs: labeled multi-turn sentiment or emotion data, and data that reflects a customer-service setting. During the team discussion, we agreed to use labeled datasets, so I evaluated each candidate on whether it had turn-level labels, whether the dialogues were multi-turn, and how closely the domain matched customer-service chatbots.
 
-**GitHub Evidence:**
+**Dataset Research:**
+
+**ABCD (Action-Based Conversations Dataset):** Real customer-agent dialogues with annotated intents and agent actions. Supports our extensions on conversational failures and escalation. https://github.com/asappresearch/abcd
+**Dialogue Breakdown Detection Challenge (DBDC3/DBDC4):** Chatbot conversations with turn-level breakdown labels, which can help us identify where a conversation goes wrong. https://sites.google.com/site/dialoguebreakdowndetection4/datasets?authuser=0
+**EmoryNLP:** Multi-party dialogues with utterance-level emotion labels, adding more labeled sentiment trajectories beyond MELD. https://github.com/emorynlp/emotion-detection
+
+**GitHub Evidence:** 70ff642
 
 ### Vaibhav Devarapalli
 
