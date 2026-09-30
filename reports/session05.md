@@ -101,7 +101,7 @@ The central hypothesis is that a customer's emotional trajectory contains predic
 **Dialogue Breakdown Detection Challenge (DBDC3/DBDC4):** Chatbot conversations with turn-level breakdown labels, which can help us identify where a conversation goes wrong. https://sites.google.com/site/dialoguebreakdowndetection4/datasets?authuser=0
 **EmoryNLP:** Multi-party dialogues with utterance-level emotion labels, adding more labeled sentiment trajectories beyond MELD. https://github.com/emorynlp/emotion-detection
 
-**GitHub Evidence:** 70ff642
+**GitHub Evidence:** a119ca4
 
 ### Vaibhav Devarapalli
 
