@@ -1,0 +1,23 @@
+# Dashboard theme: cream surfaces with light green accents.
+
+[theme]
+base = "light"
+primaryColor = "#4F9A6A"
+backgroundColor = "#FBF8EE"
+secondaryBackgroundColor = "#EEF4E3"
+textColor = "#24332A"
+borderColor = "#DCE6CE"
+dataframeHeaderBackgroundColor = "#EEF4E3"
+baseRadius = "0.75rem"
+showWidgetBorder = true
+
+[theme.sidebar]
+backgroundColor = "#EAF3DE"
+secondaryBackgroundColor = "#FBF8EE"
+borderColor = "#CFDDBD"
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false

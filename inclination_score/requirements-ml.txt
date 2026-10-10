@@ -1,0 +1,5 @@
+# Phase 6 (v3 transformer) only. Install torch with the CUDA wheel index first, e.g.
+#   uv pip install torch --index-url https://download.pytorch.org/whl/cu124
+torch>=2.4
+transformers>=4.48
+accelerate>=1.0
