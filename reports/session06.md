@@ -98,7 +98,11 @@ Links:
 
 **Still open:** the 60-conversation validation sample has only LLM annotations so far and needs human labels from the team; the Gemini-based features are implemented but not yet run in full.
 
-**GitHub Evidence:** 5bf0fbf (branch `shantanu/inclination-score`)
+**GitHub Evidence:**
+
+- `5bf0fbf` Add Inclination Score pipeline and dashboard (66 files in `inclination_score/`)
+- `9276549` Add Week 06 report with Shantanu's contributions
+- Pull request #1, merged into `main`: https://github.com/tbdestroyer/NLP_Project/pull/1
 
 ### Vaibhav Devarapalli
 
