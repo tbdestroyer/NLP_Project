@@ -74,7 +74,9 @@ Links:
 
 ### Ayesha Khan
 
-**Contributions:** Discussed concerns on the feasibility and potential challenges of performing a "real-life" evaluation for our chosen topic of identifying "sentiment-switching in the midst of a conversation". Next steps for me are to find related research papers.
+**Contributions:** Met with the team. Discussed the basic goal is not to measure 'sentiment switch' per se, but primarily to compute the metric 'inclination score' which will be computed per chat, and will measure how likely a customer is to purchase the product. We decided to get the first version running as the next step.
+
+Next step: The next step for me and the team is to understand the code for the first version created by Shantanu Ramavat. And plan on the next steps - potentially for improved accuracy, validation (manual), and user interface.
 
 **GitHub Evidence:** commit hash: e1f8546
 
