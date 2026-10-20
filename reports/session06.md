@@ -113,7 +113,7 @@ commit hash: 3fdcc2c
 
 **Contributions:** In the team meeting I proposed using the complete version of the CraigslistBargains dataset. The Hugging Face copy used in the first version has no outcome for 2,219 of the 6,682 dialogues (about a third of the data, including its whole test split), so those had to be excluded. The original release on CodaLab has the deal outcome for every dialogue, which would give us more conversations and many more no-deal examples to train and test on. The team agreed, and I downloaded the original release and started working on a full-data version of the pipeline.
 
-**GitHub Evidence:** 
+**GitHub Evidence:** commit code: d559374
 
 ## 7. Lean Canvas Changes (If Any)
 
