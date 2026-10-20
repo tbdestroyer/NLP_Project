@@ -1,7 +1,7 @@
-# Weekly Project Report — Week 05
+# Weekly Project Report — Week 06
 
 **Team Name:**  
-**Date:** September 29, 2026
+**Date:** October 13, 2026
 
 ## Team Members
 
@@ -111,20 +111,9 @@ commit hash: 3fdcc2c
 
 ### Vaibhav Devarapalli
 
-**Contributions:** I researched potential public datasets that could be used for our project. During the team discussion, we considered whether to use labeled or unlabeled conversational datasets and agreed to move forward with labeled datasets for the project. I then researched and looked into several conversational datasets to identify which ones fit our project's focus on sentiment changes across multi-turn conversations.
+**Contributions:** In the team meeting I proposed using the complete version of the CraigslistBargains dataset. The Hugging Face copy used in the first version has no outcome for 2,219 of the 6,682 dialogues (about a third of the data, including its whole test split), so those had to be excluded. The original release on CodaLab has the deal outcome for every dialogue, which would give us more conversations and many more no-deal examples to train and test on. The team agreed, and I downloaded the original release and started working on a full-data version of the pipeline.
 
-**Dataset Research:**
-
-- **MELD** — Multi-turn conversations with sentiment and emotion labels.
-  https://github.com/declare-lab/MELD
-
-- **DailyDialog** — Multi-turn everyday conversations with emotion and dialogue-act annotations.
-  https://github.com/dialoguesystems/dialogue-datasets/tree/master/dailyDialog
-
-- **EmotionLines** — Multi-party conversations with turn-level emotion annotations.
-  https://arxiv.org/abs/1802.08379
-
-**GitHub Evidence:** 54aa6fe
+**GitHub Evidence:** 
 
 ## 7. Lean Canvas Changes (If Any)
 
