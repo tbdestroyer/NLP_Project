@@ -71,7 +71,7 @@ Training and evaluation: reran the pipeline and retrained v1 and v3 on all three
 Caveats: on the same 670 test conversations as before, v1 goes from 0.746 to 0.768, so part of the gain comes from the recovered conversations being easier. Calibration on Craigslist got worse, and SaaS v3 came out at 0.599 against 0.667 with unchanged data (retraining variation).
 Docs and tests: updated the README, PROJECT_EXPLAINER, data notes and report, and the loader tests (81 tests).
 
-**GitHub Evidence:** 8be1d79 Use the full CraigslistBargains release
+**GitHub Evidence:** Commit code: c2c634c
 Pull request #3, merged into main: https://github.com/tbdestroyer/NLP_Project/pull/3
 
 ## 7. Lean Canvas Changes (If Any)
