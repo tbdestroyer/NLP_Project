@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 216 33% 98%;
+    --foreground: 218 50% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 218 50% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 218 50% 13%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 32% 94%;
+    --secondary-foreground: 218 40% 20%;
+    --muted: 214 30% 95%;
+    --muted-foreground: 215 17% 42%;
+    --accent: 214 38% 93%;
+    --accent-foreground: 218 50% 13%;
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 28% 88%;
+    --input: 214 28% 84%;
+    --ring: 221 83% 53%;
+    --radius: 1rem;
+    color-scheme: light;
+  }
+
+  .dark {
+    --background: 219 45% 8%;
+    --foreground: 213 35% 94%;
+    --card: 218 39% 12%;
+    --card-foreground: 213 35% 94%;
+    --popover: 218 39% 12%;
+    --popover-foreground: 213 35% 94%;
+    --primary: 217 91% 65%;
+    --primary-foreground: 220 55% 10%;
+    --secondary: 216 30% 18%;
+    --secondary-foreground: 213 35% 94%;
+    --muted: 216 30% 17%;
+    --muted-foreground: 215 19% 68%;
+    --accent: 216 30% 20%;
+    --accent-foreground: 213 35% 94%;
+    --destructive: 0 62% 42%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 216 24% 23%;
+    --input: 216 24% 28%;
+    --ring: 217 91% 65%;
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+    font-feature-settings: "tnum" 1;
+  }
+
+  body {
+    @apply min-w-[320px] bg-background font-sans text-foreground antialiased;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  button, input, textarea, select {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline: 3px solid hsl(var(--ring));
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hide-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .animate-reduced-safe {
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

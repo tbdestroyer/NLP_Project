@@ -9,7 +9,7 @@ endif
 # Package and model caches stay inside the project folder.
 export UV_CACHE_DIR := .cache/uv
 
-.PHONY: setup download inspect data train train-v3 llm export export-v2 eval app test all
+.PHONY: setup download inspect data train train-v3 llm export export-v2 eval app api test all
 
 setup:
 	uv venv --python 3.11 .venv
@@ -48,6 +48,10 @@ eval:
 
 app:
 	$(PY) -m streamlit run app/Home.py
+
+# Data server for the React UI in ../web (reads outputs/ only).
+api:
+	$(PY) -m uvicorn api.server:app --port 8000 --reload
 
 test:
 	$(PY) -m pytest -q
