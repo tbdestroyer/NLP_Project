@@ -1,7 +1,7 @@
 # Weekly Project Report — Week 08
 
 **Team Name:**  
-**Date:** 
+**Date:**  October 21, 2026
 
 ## Team Members
 
@@ -11,7 +11,7 @@
 | Ayesha Khan | ayekhan@umd.edu | ayekhan12 | Product Idea / DS |
 | Namratha Jeetendra | namrath4@umd.edu | namrathajeetendra | |
 | Shantanu Ramavat | sramavat@umd.edu | sramavat-24 | Software Engineer |
-| Vaibhav Devarapalli | gdevarap@umd.edu | | |
+| Vaibhav Devarapalli | gdevarap@umd.edu | vaibhavdevarapalli | |
 
 ## 1. Shipped This Week
 
@@ -71,7 +71,7 @@
 - Caveats: on the same 670 test conversations as before, v1 goes from 0.746 to 0.768, so part of the gain comes from the recovered conversations being easier. Calibration on Craigslist got worse, and SaaS v3 came out at 0.599 against 0.667 with unchanged data (retraining variation).
 - Docs and tests: updated the README, PROJECT_EXPLAINER, data notes and report, and the loader tests (81 tests).
 
-**GitHub Evidence:** Commit code: c2c634c
+**GitHub Evidence:** Commit code: 8be1d79
 Pull request #3, merged into main: https://github.com/tbdestroyer/NLP_Project/pull/3
 
 ## 7. Lean Canvas Changes (If Any)
