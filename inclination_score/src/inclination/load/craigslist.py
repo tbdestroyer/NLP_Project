@@ -1,52 +1,70 @@
-"""CraigslistBargains loader: buyer = customer, seller = agent, outcome = an accept act exists.
+"""CraigslistBargains loader: buyer = customer, seller = agent, outcome = the dataset's own reward.
 
-Structured action turns (offer / accept / reject / quit) are used only to derive the outcome and
-are then dropped. Dialogues without dialogue acts have an unknown outcome and are excluded.
+Reads the original CoCoA release (train/dev/test.json), which has an outcome for every dialogue.
+Structured action events (offer / accept / reject / quit) are dropped, and nothing after an
+accept or quit is kept. Conversation ids use the Hugging Face split names and row positions, so
+they are the same as when the parquet copy was used.
 """
+import json
 from pathlib import Path
 
-import pandas as pd
+from inclination.config import ROOT
 
 DATASET = "craigslist"
 
 
-def read_raw(raw_dir: Path) -> dict[str, pd.DataFrame]:
-    """Returns {hf_split: frame}; the split name only serves to build stable conversation ids."""
-    return {p.stem.split("-")[-1]: pd.read_parquet(p) for p in sorted(raw_dir.rglob("*.parquet"))}
+def read_raw(raw_dir: Path, src: dict) -> dict[str, list[dict]]:
+    """Returns {id_split: dialogues}; the split name only serves to build stable ids."""
+    return {
+        id_split: json.loads((raw_dir / filename).read_text(encoding="utf-8"))
+        for id_split, filename in src["files"].items()
+    }
 
 
-def standardise(frames: dict[str, pd.DataFrame], src: dict) -> list[dict]:
-    action_intents = set(src["action_intents"])
-    terminal_intents = set(src["terminal_intents"])
+def read_recovered(recovered_path: Path) -> set[str]:
+    """Ids of the dialogues that have no dialogue acts in the Hugging Face copy."""
+    by_split = json.loads(recovered_path.read_text(encoding="utf-8"))
+    return {f"{DATASET}-{split}-{i}" for split, indices in by_split.items() for i in indices}
+
+
+def standardise(dialogues: dict[str, list[dict]], src: dict, recovered: set) -> list[dict]:
+    action_events = set(src["action_events"])
+    terminal_events = set(src["terminal_events"])
     records = []
-    for hf_split, df in frames.items():
-        for index, row in enumerate(df.itertuples(index=False)):
-            intents = list(row.dialogue_acts["intent"])
-            if not any(intents):
-                continue  # no dialogue acts: outcome cannot be derived
-            roles = list(row.agent_info["Role"])
+    for id_split, rows in dialogues.items():
+        for index, row in enumerate(rows):
+            kbs = row["scenario"]["kbs"]
+            roles = [kb["personal"]["Role"] for kb in kbs]
             turns = []
-            for speaker, intent, text in zip(row.agent_turn, intents, row.utterance):
-                if intent in action_intents:
-                    if intent in terminal_intents:
+            for event in row["events"]:
+                if event["action"] in action_events:
+                    if event["action"] in terminal_events:
                         break
                     continue
+                speaker = int(event["agent"])
                 role = "customer" if roles[speaker] == src["customer_role"] else "agent"
-                turns.append((role, text))
-            records.append({
+                turns.append((role, event["data"]))
+            item = kbs[0]["item"]  # both agents see the same title, category and listing price
+            conversation_id = f"{DATASET}-{id_split}-{index}"
+            record = {
                 "dataset": DATASET,
-                "conversation_id": f"{DATASET}-{hf_split}-{index}",
-                "outcome": int(src["positive_intent"] in intents),
-                "title": str(row.items["Title"][0]),
+                "conversation_id": conversation_id,
+                "outcome": int(row["outcome"]["reward"]),
+                "title": str(item["Title"]),
                 "meta": {
-                    "category": str(row.items["Category"][0]),
-                    "listing_price": float(row.items["Price"][0]),
+                    "category": str(item["Category"]),
+                    "listing_price": float(item["Price"]),
                 },
                 "is_synthetic": False,
                 "turns": turns,
-            })
+            }
+            if conversation_id in recovered:
+                # split on their own, so the dialogues used before keep their train/val/test split
+                record["split_batch"] = src["recovered_batch"]
+            records.append(record)
     return records
 
 
 def load(raw_dir: Path, cfg: dict) -> list[dict]:
-    return standardise(read_raw(raw_dir), cfg["data"]["sources"][DATASET])
+    src = cfg["data"]["sources"][DATASET]
+    return standardise(read_raw(raw_dir, src), src, read_recovered(ROOT / src["recovered_file"]))

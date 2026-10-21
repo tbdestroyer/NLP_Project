@@ -1,7 +1,9 @@
 # Inclination Score: project explainer
 
-*For the project group and the professor. Last updated 2026-10-10. The Gemini LLM features are
-implemented, but their full run was paused part-way, so no Gemini results are reported here.*
+*For the project group and the professor. Last updated 2026-10-21, after switching
+CraigslistBargains to its full original release and rerunning both models. The Gemini LLM
+features are implemented, but their full run was paused part-way, so no Gemini results are
+reported here.*
 
 ## 1. The project in one paragraph
 
@@ -14,10 +16,10 @@ dashboard meant for a sales manager.
 
 **Where we are now:** the whole pipeline runs end to end with two models: a baseline (v1) and a
 fine-tuned transformer (v3). Both rank buyers above non-buyers better than chance on all three
-datasets, but both are weak early in the conversation. The transformer is clearly better on
-Craigslist (test ROC AUC 0.88 against 0.75), no better on Persuasion for Good (0.61 against
-0.62) and worse on the synthetic SaaS data (0.67 against 0.78). It is a smaller transformer than
-planned, because of the laptop's GPU (section 8). The dashboard shows both models. The labelling
+datasets, but both are weak early in the conversation except on Craigslist. The transformer is
+clearly better on Craigslist (test ROC AUC 0.91 against 0.83), no better on Persuasion for Good
+(0.61 against 0.62) and worse on the synthetic SaaS data (0.60 against 0.78). It is a smaller transformer than
+planned, because of GPU memory (section 8). The dashboard shows both models. The labelling
 tool is ready, but **nobody has labelled anything yet: that is the group's next job**
 (section 8a). The LLM features are coded but have not been run in full.
 
@@ -25,8 +27,8 @@ tool is ready, but **nobody has labelled anything yet: that is the group's next 
 score ranks buyers above non-buyers, and the explanations point at messages that really drive
 the score. The bad news: the score's turn-by-turn movements and turning points do not agree
 with an annotator's judgement, models do not transfer between datasets, and early prediction is
-weak. The honest summary is "useful for ranking leads at the end of a conversation; not yet
-reliable as a live, message-by-message reading".
+weak outside Craigslist. The honest summary is "useful for ranking leads at the end of a
+conversation; not yet reliable as a live, message-by-message reading".
 
 ## 2. Why this is worth doing
 
@@ -66,12 +68,12 @@ dataset.
 
 | dataset | what it is | customer / agent | "bought" means | conversations used | positive rate |
 |---|---|---|---|---|---|
-| CraigslistBargains | real people bargaining over a Craigslist listing | buyer / seller | the deal was accepted | 4,462 | 85.8% |
+| CraigslistBargains | real people bargaining over a Craigslist listing | buyer / seller | the deal was accepted | 6,331 | 77.3% |
 | Persuasion for Good | real people; one persuades the other to donate to a charity | persuadee / persuader | the persuadee actually donated more than $0 | 1,017 | 53.6% |
 | SaaS Sales Conversations | **synthetic**, generated with GPT-4 | customer / sales rep | the dataset's `outcome` field is 1 | 20,000 (sampled from 100,000) | 49.9% |
 
-Average length is 8.7, 20.6 and 12.2 turns respectively. In total: 25,479 conversations and
-302,891 turns.
+Average length is 7.8, 20.6 and 12.2 turns respectively. In total: 27,348 conversations and
+313,220 turns.
 
 **Splits.** 70% train, 15% validation, 15% test, made per dataset, stratified by outcome, with a
 fixed seed (42). The split is by whole conversation, so all prefixes of a conversation are in the
@@ -79,7 +81,7 @@ same split. The assignment is saved to a file and reused by every later step.
 
 | dataset | train | val | test |
 |---|---|---|---|
-| craigslist | 3,123 | 669 | 670 |
+| craigslist | 4,431 | 949 | 951 |
 | p4g | 711 | 153 | 153 |
 | saas | 14,000 | 3,000 | 3,000 |
 
@@ -88,18 +90,24 @@ same split. The assignment is saved to a file and reused by every later step.
 These are the decisions most likely to be asked about.
 
 **CraigslistBargains**
-- *A third of the dialogues have no usable label.* The copy available on Hugging Face has no
-  dialogue-act annotations for 2,219 of 6,682 dialogues, including its whole test split. In those,
-  the "accept" and "reject" button presses both appear as empty messages and cannot be told
-  apart. The original raw files (on CodaLab) are no longer reachable. We excluded these dialogues
-  instead of guessing labels, and made our own split over the 4,463 labelled ones.
+- *We use the original release, which has a label for every dialogue.* The first version used
+  the copy on Hugging Face, which has no dialogue-act annotations for 2,219 of 6,682 dialogues,
+  including its whole test split; there "accept" and "reject" both appear as empty messages, so
+  those dialogues were excluded. The original files (on CodaLab) have to be saved by hand from a
+  browser, but they carry the outcome of every dialogue. The excluded third was mostly where the
+  no-deals were: 52.9% of it ends in a deal, against 85.8% of the rest.
+- *Old and new results can be compared.* For the 4,463 dialogues of the Hugging Face copy, the
+  new loader gives exactly the same turns and labels. The recovered dialogues are split on their
+  own, so the 4,462 used before keep their split and the annotation sample stays in test.
 - *Button presses are removed.* Offer, accept, reject and quit are structured actions, not typed
   messages. They are used to derive the outcome and then dropped. Anything typed after an accept
   or quit is dropped too. Text typed after a *rejected* offer is kept, because bargaining
-  continues there (this happens in 1,072 dialogues).
-- *Dialogues that just stop* (214 with no accept, reject or quit) count as no deal.
-- *It is imbalanced.* 85.8% end in a deal, leaving about 630 negatives, of which about 95 are in
-  the test split.
+  continues there (this happens in 1,491 dialogues).
+- *Dialogues that just stop* (634 with no accept, reject or quit) count as no deal.
+- *Very short dialogues are dropped.* 351 dialogues have fewer than two messages before the
+  outcome (133 have none); they are removed, which leaves 6,331.
+- *It is imbalanced.* 77.3% end in a deal, leaving 1,435 negatives, of which 216 are in the test
+  split.
 
 **Persuasion for Good**
 - The label is the **actual** donation recorded after the chat, not what the person said they
@@ -235,70 +243,89 @@ All on the test split, per dataset and per model.
 
 ### Results so far: v1 baseline and v3 transformer
 
-Test split, final-turn score. Full tables are in `eval/report.md`. Test sets hold 670
+Test split, final-turn score. Full tables are in `eval/report.md`. Test sets hold 951
 (Craigslist), 153 (Persuasion for Good) and 3,000 (SaaS) conversations.
 
 | dataset | base rate | model | ROC AUC (95% CI) | PR AUC | Brier (base-rate baseline) | top 10 converted | top 20 converted |
 |---|---|---|---|---|---|---|---|
-| CraigslistBargains | 85.8% | v1 | 0.746 (0.698–0.791) | 0.943 | 0.113 (0.122) | 100% | 100% |
-| | | v3 | **0.880** (0.847–0.910) | 0.974 | 0.099 (0.122) | 100% | 100% |
+| CraigslistBargains | 77.3% | v1 | 0.827 (0.794–0.859) | 0.930 | 0.152 (0.176) | 100% | 100% |
+| | | v3 | **0.908** (0.887–0.929) | 0.965 | 0.129 (0.176) | 100% | 100% |
 | Persuasion for Good | 53.6% | v1 | 0.616 (0.527–0.701) | 0.636 | 0.247 (0.249) | 70% | 70% |
-| | | v3 | 0.605 (0.515–0.691) | 0.646 | 0.247 (0.249) | 80% | 80% |
+| | | v3 | 0.609 (0.514–0.693) | 0.672 | 0.252 (0.249) | 80% | 80% |
 | SaaS (synthetic) | 49.9% | v1 | **0.778** (0.762–0.793) | 0.760 | 0.202 (0.250) | 100% | 95% |
-| | | v3 | 0.667 (0.648–0.686) | 0.625 | 0.232 (0.250) | 90% | 90% |
+| | | v3 | 0.599 (0.580–0.617) | 0.572 | 0.243 (0.250) | 80% | 80% |
+
+**What the full Craigslist release changed.** The first version used the Hugging Face copy
+(4,462 dialogues, 670 in test, 85.8% deals). With the full release:
+
+| | first version | full release |
+|---|---|---|
+| Craigslist test conversations (no-deals) | 670 (95) | 951 (216) |
+| v1 test ROC AUC | 0.746 | 0.827 |
+| v3 test ROC AUC | 0.880 | 0.908 |
+| v1 / v3 ROC AUC at 50% of the conversation | 0.585 / 0.629 | 0.732 / 0.741 |
+| v1 on the 670 test conversations both versions share | 0.746 | 0.768 |
+
+The gain on the shared conversations is smaller than the overall one, so part of the overall
+gain comes from the recovered conversations being easier to predict. The intervals are now
+narrower because the test split has more than twice as many no-deals.
 
 **Early prediction (ROC AUC by share of the conversation seen):**
 
 | dataset | model | 10% | 25% | 50% | 75% | 100% |
 |---|---|---|---|---|---|---|
-| CraigslistBargains | v1 | 0.514 | 0.559 | 0.585 | 0.673 | 0.746 |
-| | v3 | 0.500 | 0.574 | 0.629 | 0.741 | 0.880 |
+| CraigslistBargains | v1 | 0.488 | 0.614 | 0.732 | 0.789 | 0.827 |
+| | v3 | 0.570 | 0.600 | 0.741 | 0.821 | 0.908 |
 | Persuasion for Good | v1 | 0.586 | 0.550 | 0.605 | 0.609 | 0.616 |
-| | v3 | 0.552 | 0.543 | 0.572 | 0.602 | 0.605 |
+| | v3 | 0.526 | 0.507 | 0.501 | 0.547 | 0.609 |
 | SaaS (synthetic) | v1 | 0.596 | 0.605 | 0.613 | 0.670 | 0.778 |
-| | v3 | 0.578 | 0.611 | 0.621 | 0.641 | 0.667 |
+| | v3 | 0.545 | 0.557 | 0.571 | 0.589 | 0.599 |
 
 Figures: `outputs/figures/early_prediction_v1.png` and `early_prediction_v3.png`.
 
-**Important: v3 is not the model we planned.** The plan was ModernBERT-base. It does not fit in
-the 4 GB of the laptop GPU (a GTX 1650 Ti) at the input lengths these conversations need, so we
-used the plan's stated fallback, `distilroberta-base`, a smaller model. Inputs are capped at 512
-tokens, keeping the most recent turns. For SaaS it was trained on 4,000 of the 14,000 training
-conversations to keep the run to about 2.3 hours in total. v3 scores exist for the validation and
-test splits only.
+**Important: v3 is not the model we planned.** The plan was ModernBERT-base. It did not fit in
+the 4 GB GPU used for the first version (a GTX 1650 Ti) at the input lengths these conversations
+need, so we used the plan's stated fallback, `distilroberta-base`, a smaller model. Inputs are
+capped at 512 tokens, keeping the most recent turns. For SaaS it was trained on 4,000 of the
+14,000 training conversations to keep the first run to about 2.3 hours in total. v3 scores exist
+for the validation and test splits only. For the full Craigslist release, v3 was retrained for
+all three datasets on an 8 GB RTX 4070 Laptop GPU, in about 1.4 hours, with the same model and
+settings so the two versions can be compared.
 
 **How to read these.**
-- **Craigslist: the transformer is clearly better** (0.88 against 0.75; the intervals do not
+- **Craigslist: the transformer is clearly better** (0.91 against 0.83; the intervals do not
   overlap). Reading the whole negotiation helps more than counting cues, and the gain shows from
-  the halfway point on.
+  the three-quarter point on.
 - **Persuasion for Good: no difference.** Both models are near 0.61 with wide, overlapping
-  intervals, and neither beats the base-rate Brier score. With 711 training conversations and a
+  intervals, and neither clearly beats the base-rate Brier score. With 711 training conversations and a
   noisy label (people say they will donate and then do not), a bigger model has nothing more to
   learn from. This looks like a limit of the data, not of the model.
-- **SaaS: the transformer is worse than the baseline** (0.67 against 0.78). Two likely reasons,
+- **SaaS: the transformer is worse than the baseline** (0.60 against 0.78). Two likely reasons,
   neither tested yet: it saw under a third of the training conversations that v1 saw, and its
-  validation score was already falling after the first epoch, so it stopped early. We should say
-  this plainly and not present v3 as the better model overall.
-- **Early prediction is still weak for both models.** At the halfway point every result is
-  between 0.57 and 0.63. Most of the signal arrives in the last quarter of the conversation.
-- Craigslist's 100% in the top 20 is less impressive than it looks, because 86% convert anyway.
-- v1 overfits (train AUC 0.84 to 0.92 against 0.62 to 0.78 on test). Neither model has been tuned.
+  validation score stayed low (about 0.55), so it stopped early. The first version's run gave
+  0.667 on the same, unchanged SaaS data, so v3 on SaaS also varies a lot from run to run. We
+  should say this plainly and not present v3 as the better model overall.
+- **Early prediction is still weak outside Craigslist.** At the halfway point Craigslist reaches
+  0.73 (v1) and 0.74 (v3); the other datasets are between 0.50 and 0.61. Most of the signal
+  still arrives in the last quarter of the conversation.
+- Craigslist's 100% in the top 20 is less impressive than it looks, because 77% convert anyway.
+- v1 overfits (train AUC 0.84 to 0.91 against 0.62 to 0.83 on test). Neither model has been tuned.
 
 **Turning points and explanations (threshold 0.15).** v1 is counted over all splits; v3 only
 over the validation and test splits, which is all it scored.
 
 | dataset | model | turns scored | turning points | flagged weak |
 |---|---|---|---|---|
-| CraigslistBargains | v1 | 38,762 | 82 | 12% |
-| | v3 | 11,555 | 260 | 32% |
+| CraigslistBargains | v1 | 49,091 | 1,858 | 3% |
+| | v3 | 14,653 | 913 | 13% |
 | Persuasion for Good | v1 | 20,932 | 662 | 1% |
-| | v3 | 6,315 | 241 | 20% |
+| | v3 | 6,315 | 347 | 24% |
 | SaaS (synthetic) | v1 | 243,197 | 5,590 | under 1% |
-| | v3 | 72,826 | 285 | 9% |
+| | v3 | 72,826 | 94 | 21% |
 
-- For v1, removing the trigger message changes the score by 0.15 to 0.20 on average, so the
+- For v1, removing the trigger message changes the score by 0.17 to 0.19 on average, so the
   turns it points to do drive its score.
-- For v3, more explanations are weak (9% to 32%). The transformer reads the whole context, so
+- For v3, more explanations are weak (13% to 24%). The transformer reads the whole context, so
   removing one message more often leaves the score where it was. v3 also gives no per-feature
   breakdown; its explanation is the cue-based sentence plus the faithfulness check.
 - v3 finds more turning points per conversation than v1 on Craigslist, and far fewer on SaaS,
@@ -313,12 +340,12 @@ far more than removing a random other message from the same conversation.
 
 | dataset | model | turning points | trigger removed | random turn removed | ratio |
 |---|---|---|---|---|---|
-| CraigslistBargains | v1 | 14 | 0.113 | 0.035 | 3.2x |
-| | v3 | 141 | 0.115 | 0.046 | 2.5x |
+| CraigslistBargains | v1 | 263 | 0.172 | 0.026 | 6.6x |
+| | v3 | 482 | 0.136 | 0.049 | 2.8x |
 | Persuasion for Good | v1 | 105 | 0.191 | 0.031 | 6.2x |
-| | v3 | 107 | 0.162 | 0.044 | 3.7x |
+| | v3 | 180 | 0.174 | 0.043 | 4.1x |
 | SaaS (synthetic) | v1 | 855 | 0.183 | 0.032 | 5.7x |
-| | v3 | 140 | 0.173 | 0.032 | 5.4x |
+| | v3 | 47 | 0.148 | 0.043 | 3.4x |
 
 This is the strongest positive result about the explanations. One caveat: a turning point is
 defined by a jump at that message, so some effect from removing it is expected by construction.
@@ -327,12 +354,13 @@ The random-turn baseline shows it is specific to that message.
 **2. The score's turn-by-turn movements do not match the annotator.** This is the weakest
 result, and it should be reported as such. Against the LLM annotator (there are no human labels):
 
-- *Direction (up / same / down) on 382 customer turns:* v1 is right 42.9% of the time and v3
-  45.3%. Always answering "same" would be right 51.8% of the time. Cohen's kappa is 0.13 for v1
-  and 0.04 for v3, which is close to no agreement beyond chance.
-- *Turning points (within one turn):* precision is 6% to 14% and recall 6% to 12% across both
+- *Direction (up / same / down) on 382 customer turns:* v1 is right 45.5% of the time and v3
+  48.2%. Always answering "same" would be right 51.8% of the time. Cohen's kappa is 0.17 for v1
+  and 0.08 for v3, which is little agreement beyond chance. The one exception is v1 on
+  Craigslist: 64.3% against 37.1% for always "same" (kappa 0.34), but on only 70 turns.
+- *Turning points (within one turn):* precision is 12% to 21% and recall 12% to 24% across both
   models and both detection methods. The annotator marked 33 turning points; the models marked
-  22 to 33, mostly in different places.
+  32 to 52, mostly in different places.
 
 So the score ranks conversations reasonably by how they end, but the individual ups and downs
 of the curve are not the ones a reader would pick. Possible reasons: the models are trained only
@@ -342,25 +370,27 @@ and the direction result depends on the ±0.02 band used to call a change "same"
 **3. The two turning-point methods disagree with the annotator about equally.** Change-point
 detection (method B) finds more points than the score-jump rule (method A) on most datasets, for
 example 1.05 against 0.69 per conversation on Persuasion for Good with v1. Neither is clearly
-better against the labels (F1 0.06 to 0.12 overall).
+better against the labels (F1 0.12 to 0.19 overall).
 
 **4. Models do not transfer across domains.** ROC AUC when trained on the row and tested on the
 column (in-domain on the diagonal):
 
 | v3 trained on | CraigslistBargains | Persuasion for Good | SaaS |
 |---|---|---|---|
-| CraigslistBargains | **0.884** | 0.616 | 0.616 |
-| Persuasion for Good | 0.584 | **0.605** | 0.524 |
-| SaaS (synthetic) | 0.487 | 0.491 | **0.668** |
+| CraigslistBargains | **0.909** | 0.619 | 0.633 |
+| Persuasion for Good | 0.618 | **0.609** | 0.490 |
+| SaaS (synthetic) | 0.542 | 0.507 | **0.603** |
 
-v1 shows the same pattern (off-diagonal 0.55 to 0.60). Two things stand out. The Craigslist
-transformer scores 0.616 on Persuasion for Good, as good as the model trained on that data,
+v1 shows the same pattern (off-diagonal 0.52 to 0.60). Two things stand out. The Craigslist
+transformer scores 0.619 on Persuasion for Good, as good as the model trained on that data,
 which again suggests that dataset has a low ceiling. And the transformer trained on synthetic
-SaaS data is at or below chance on both real datasets (0.49), so what it learned from the
+SaaS data is close to chance on both real datasets (0.54 and 0.51), so what it learned from the
 synthetic conversations does not carry over to real ones.
 
-**5. Calibration is acceptable except for v3 on Persuasion for Good.** Expected calibration
-error is 0.04 to 0.08 everywhere else and 0.14 there. Figures: `reliability_v1.png`,
+**5. Calibration is acceptable but worse on Craigslist than before.** Expected calibration
+error is 0.03 to 0.11, and 0.13 for v3 on Persuasion for Good. On Craigslist it rose with the
+full release (v1: 0.094, against 0.036 in the first version): scores in the middle range are too
+high, which is where many of the recovered no-deal conversations sit. Figures: `reliability_v1.png`,
 `reliability_v3.png`.
 
 **6. Case studies.** `eval/report.md` section 8 lists, per dataset, three confident correct
@@ -370,9 +400,12 @@ IDs that open directly in the dashboard. They are ready to use in the presentati
 **Script insights (test split), largest effects only:**
 - *SaaS:* after the agent states a price, the customer's score falls on their next turn
   (−0.020 on average, a drop 58% of the time); mentioning a cost or fee is similar (−0.017).
-- *Craigslist and Persuasion for Good:* every agent move is followed by a small average rise
-  (about +0.01 to +0.02), with pushing to close and offering a discount at the top. The effects
-  are small and the intervals for the rarer moves are wide.
+- *Persuasion for Good:* every agent move is followed by a small average rise (about +0.01 to
+  +0.02). The effects are small and the intervals for the rarer moves are wide.
+- *Craigslist:* every agent move is followed by a rise, larger with the full release (about
+  +0.05 to +0.08 on average, largest for asking a question and building rapport early on).
+  Almost all v1 turning points on Craigslist are rises too (97%), so this mostly reflects the
+  score drifting upward as a negotiation goes on, not an effect of particular moves.
 
 These figures are for v1. They are associations measured with a weak baseline; we would not
 present them as findings yet.
@@ -418,16 +451,15 @@ or cue tags. The file is `annotation/labels/auto_llm.jsonl`; the readable source
   over to real sales chats.
 - **Synthetic data.** The SaaS dataset is LLM-generated, and many of its conversations end
   without a visible decision. Results on it show the pipeline works, not that the method works.
-- **Small and imbalanced test sets.** Persuasion for Good has 153 test conversations; Craigslist
-  has about 95 negatives in test. Confidence intervals will be wide.
+- **Small and imbalanced test sets.** Persuasion for Good has 153 test conversations, so its
+  confidence intervals are wide. Craigslist has 216 negatives in test (95 in the first version).
 - **Noisy labels.** In Persuasion for Good, stated intent and actual donation differ. In all
   datasets, an early prefix carries the label of an ending that was not yet decided.
 - **Late-turn scores are easy.** People often state their decision in words near the end.
-- **A third of Craigslist is unused** because its labels are unavailable.
 - **The cue tagger is keyword-based.** It misses paraphrases and misfires on some words; several
   cues are rare (refusal, delay and competitor mentions each tag under 1% of Craigslist turns).
-- **Fixed thresholds do not fit every dataset.** With an 86% base rate, almost every Craigslist
-  lead is labelled "Hot" and almost none has a turning point.
+- **Fixed thresholds do not fit every dataset.** Even with the full Craigslist release (77% base
+  rate), about 96% of Craigslist test leads are labelled "Hot" under v1.
 - **v1 explanations lean on single words.** The top contributing features are often words such
   as "okay" or "demo", which are less readable than cues.
 - **Insights are correlational.**
@@ -446,8 +478,9 @@ separate one conversation. Another test changes the turns after turn *k* and con
 up to *k* stay identical, for each trained model. By construction, every v1 feature is a sum over
 the turns seen so far.
 
-**Why not use the Craigslist dataset's own train/test split?** Its test split has no labels in
-the version we could obtain.
+**Why not use the Craigslist dataset's own train/test split?** Its test split had no labels in
+the Hugging Face copy used first, and keeping our own split lets old and new results be compared
+on the same test conversations.
 
 **Why keep the synthetic dataset at all?** It is the only one that looks like sales, it is large
 and balanced, and it is useful for developing and debugging. It is never presented as real.
@@ -460,14 +493,17 @@ faithfulness check are for. We do not claim it yet.
 
 ## 11. Reproducing it
 
+Save `train.json`, `dev.json` and `test.json` from the CodaLab worksheet into
+`data/raw/craigslist/` first (see `data/README.md`); the other datasets download automatically.
+
 ```
 .\make.ps1 setup      # virtualenv and packages
 .\make.ps1 data       # download and build the standard tables
 .\make.ps1 train      # train the v1 model per dataset (about 2 minutes)
 .\make.ps1 export     # scores, cues, turning points, leads, insights into outputs/
 .\make.ps1 eval       # metrics.json, figures, eval/report.md
-.\make.ps1 train-v3   # optional: fine-tune the transformer (about 2.3 hours on a 4 GB GPU)
-.\make.ps1 test       # 78 tests: loaders, leakage, splits, scoring, outputs, evaluation, dashboard, annotation, LLM jobs
+.\make.ps1 train-v3   # optional: fine-tune the transformer (about 2.3 hours on a 4 GB GPU, 1.4 on an 8 GB RTX 4070)
+.\make.ps1 test       # 81 tests: loaders, leakage, splits, scoring, outputs, evaluation, dashboard, annotation, LLM jobs
 .\make.ps1 all        # data, train, export and eval in one go
 .\make.ps1 app        # open the dashboard
 ```

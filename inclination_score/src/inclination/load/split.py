@@ -9,10 +9,17 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-def make_splits(conversations: pd.DataFrame, fractions: dict, seed: int) -> dict[str, str]:
-    """Returns {conversation_id: split}. One row of `conversations` = one conversation."""
+def make_splits(
+    conversations: pd.DataFrame, fractions: dict, seed: int, batches: dict | None = None
+) -> dict[str, str]:
+    """Returns {conversation_id: split}. One row of `conversations` = one conversation.
+
+    `batches` maps a conversation id to a batch name. Each batch of a dataset is split on its own,
+    so adding a new batch never moves the conversations that were already assigned.
+    """
+    batch = conversations["conversation_id"].map(batches or {}).fillna("")
     assignment = {}
-    for _, group in conversations.groupby("dataset"):
+    for _, group in conversations.assign(batch=batch).groupby(["dataset", "batch"]):
         group = group.sort_values("conversation_id")
         train, rest = train_test_split(
             group, train_size=fractions["train"], stratify=group["outcome"], random_state=seed
@@ -27,7 +34,11 @@ def make_splits(conversations: pd.DataFrame, fractions: dict, seed: int) -> dict
 
 
 def load_or_make_splits(
-    conversations: pd.DataFrame, fractions: dict, seed: int, splits_path: Path
+    conversations: pd.DataFrame,
+    fractions: dict,
+    seed: int,
+    splits_path: Path,
+    batches: dict | None = None,
 ) -> dict[str, str]:
     """Reuses the saved assignment when it covers exactly these conversations."""
     if splits_path.exists():
@@ -35,7 +46,7 @@ def load_or_make_splits(
         if set(saved) == set(conversations["conversation_id"]):
             return saved
         print(f"  {splits_path.name} does not match the current conversations; rebuilding it")
-    assignment = make_splits(conversations, fractions, seed)
+    assignment = make_splits(conversations, fractions, seed, batches)
     splits_path.parent.mkdir(parents=True, exist_ok=True)
     splits_path.write_text(json.dumps(assignment, indent=0, sort_keys=True), encoding="utf-8")
     return assignment

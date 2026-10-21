@@ -3,53 +3,84 @@ import json
 
 import pandas as pd
 
+from inclination.config import ROOT
 from inclination.load import craigslist, p4g, saas
 from inclination.load.standardise import TURN_COLUMNS, clean_text, to_tables
 
 
-def _craigslist_row(speakers, intents, utterances):
+def _craigslist_row(events, reward):
+    """`events` = [(agent, action, data)]; agent 0 is the buyer, as in the raw files."""
+    item = {"Category": "bike", "Title": "Red bike", "Price": 80.0}
     return {
-        "agent_info": {"Role": ["buyer", "seller"], "Target": [50.0, 80.0], "Bottomline": ["None"] * 2},
-        "agent_turn": speakers,
-        "dialogue_acts": {"intent": intents, "price": [-1.0] * len(intents)},
-        "utterance": utterances,
-        "items": {"Category": ["bike"] * 2, "Title": ["Red bike"] * 2, "Price": [80.0] * 2},
+        "uuid": "C_x",
+        "scenario": {"kbs": [
+            {"personal": {"Role": "buyer", "Target": 50}, "item": item},
+            {"personal": {"Role": "seller", "Target": 80}, "item": item},
+        ]},
+        "events": [{"agent": a, "action": action, "data": data} for a, action, data in events],
+        "outcome": {"reward": reward, "offer": None},
     }
 
 
-def _craigslist_records(cfg, rows):
+def _craigslist_records(cfg, rows, recovered=()):
     return craigslist.standardise(
-        {"train": pd.DataFrame(rows)}, cfg["data"]["sources"]["craigslist"]
+        {"train": rows}, cfg["data"]["sources"]["craigslist"], set(recovered)
     )
 
 
-def test_craigslist_roles_outcome_and_action_turns(cfg):
+def test_craigslist_roles_outcome_and_action_events(cfg):
     accepted = _craigslist_row(
-        [0, 1, 0, 1], ["init-price", "agree", "offer", "accept"], ["60?", "ok", "", ""]
+        [(0, "message", "60?"), (1, "message", "ok"), (0, "offer", {"price": 60}),
+         (1, "accept", None)],
+        reward=1,
     )
     rejected = _craigslist_row(
-        [1, 0, 0, 1, 0], ["intro", "offer", "unknown", "reject", "quit"], ["hi", "", "pls", "", ""]
+        [(1, "message", "hi"), (0, "offer", {"price": 20}), (0, "message", "pls"),
+         (1, "reject", None), (0, "quit", None)],
+        reward=0,
     )
     first, second = _craigslist_records(cfg, [accepted, rejected])
     assert first["outcome"] == 1 and second["outcome"] == 0
     assert first["turns"] == [("customer", "60?"), ("agent", "ok")]
-    # the text typed after a (rejected) offer is kept; the action turns are not
+    # the text typed after a (rejected) offer is kept; the action events are not
     assert second["turns"] == [("agent", "hi"), ("customer", "pls")]
     assert first["meta"] == {"category": "bike", "listing_price": 80.0}
+    assert first["title"] == "Red bike"
 
 
-def test_craigslist_drops_everything_after_a_terminal_act(cfg):
+def test_craigslist_drops_everything_after_a_terminal_event(cfg):
     row = _craigslist_row(
-        [0, 1, 0, 1, 0], ["init-price", "offer", "accept", "unknown", "unknown"],
-        ["60?", "", "", "thanks for buying", "see you"],
+        [(0, "message", "60?"), (1, "offer", {"price": 60}), (0, "accept", None),
+         (1, "message", "thanks for buying"), (0, "message", "see you")],
+        reward=1,
     )
     (record,) = _craigslist_records(cfg, [row])
     assert record["turns"] == [("customer", "60?")]
 
 
-def test_craigslist_excludes_dialogues_without_acts(cfg):
-    unlabelled = _craigslist_row([0, 1, 0], ["", "", ""], ["hi", "hello", ""])
-    assert _craigslist_records(cfg, [unlabelled]) == []
+def test_craigslist_outcome_is_the_reward(cfg):
+    # an accept clicked with no offer on the table: the dataset scores it as no deal
+    row = _craigslist_row([(1, "message", "deal?"), (1, "accept", None)], reward=0)
+    (record,) = _craigslist_records(cfg, [row])
+    assert record["outcome"] == 0
+
+
+def test_craigslist_ids_and_recovered_batch(cfg):
+    rows = [_craigslist_row([(0, "message", "hi")], reward=1) for _ in range(3)]
+    records = _craigslist_records(cfg, rows, recovered={"craigslist-train-1"})
+    assert [r["conversation_id"] for r in records] == [
+        "craigslist-train-0", "craigslist-train-1", "craigslist-train-2"
+    ]
+    batch = cfg["data"]["sources"]["craigslist"]["recovered_batch"]
+    assert [r.get("split_batch") for r in records] == [None, batch, None]
+
+
+def test_craigslist_recovered_file_matches_the_hf_copy(cfg):
+    src = cfg["data"]["sources"]["craigslist"]
+    recovered = craigslist.read_recovered(ROOT / src["recovered_file"])
+    # 2,219 dialogues without dialogue acts in the HF copy, including its whole test split
+    assert len(recovered) == 2219
+    assert {f"craigslist-test-{i}" for i in range(838)} <= recovered
 
 
 def test_p4g_roles_and_actual_donation(cfg):

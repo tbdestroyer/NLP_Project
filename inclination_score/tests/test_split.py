@@ -35,6 +35,22 @@ def test_make_splits_is_deterministic_and_order_independent(cfg):
     assert make_splits(conversations, fractions, seed) == make_splits(shuffled, fractions, seed)
 
 
+def test_a_new_batch_does_not_move_existing_conversations(cfg):
+    fractions, seed = cfg["data"]["split_fractions"], cfg["seed"]
+    before = make_splits(_conversations(), fractions, seed)
+    added = pd.DataFrame({
+        "dataset": ["a"] * 100,
+        "conversation_id": [f"new{i}" for i in range(100)],
+        "outcome": [int(i % 2 == 0) for i in range(100)],
+    })
+    batches = dict.fromkeys(added["conversation_id"], "new")
+    after = make_splits(pd.concat([_conversations(), added]), fractions, seed, batches)
+    assert {cid: after[cid] for cid in before} == before
+    new_splits = pd.Series([after[cid] for cid in added["conversation_id"]])
+    for name, fraction in fractions.items():
+        assert abs((new_splits == name).mean() - fraction) < 0.01
+
+
 def test_saved_splits_are_reused(cfg, tmp_path):
     conversations = _conversations()
     fractions = cfg["data"]["split_fractions"]

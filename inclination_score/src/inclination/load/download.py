@@ -1,4 +1,7 @@
-"""Downloads the three raw datasets into data/raw/. Run: python -m inclination.load.download"""
+"""Downloads the raw datasets into data/raw/. Run: python -m inclination.load.download
+
+Craigslist is the exception: its files are saved by hand and only checked here.
+"""
 from pathlib import Path
 from urllib.parse import quote
 
@@ -6,19 +9,20 @@ from inclination.config import load_config, path  # first: sets HF_HOME before t
 
 import pyarrow.parquet as pq
 import requests
-from huggingface_hub import HfFileSystem, hf_hub_download
+from huggingface_hub import HfFileSystem
 
 
-def download_craigslist(src: dict, out_dir: Path) -> None:
-    for filename in src["files"]:
-        hf_hub_download(
-            src["hf_repo"],
-            filename,
-            repo_type="dataset",
-            revision=src["hf_revision"],
-            local_dir=out_dir,
+def check_craigslist(src: dict, out_dir: Path) -> None:
+    """The original release cannot be downloaded automatically (expired TLS certificate)."""
+    missing = [name for name in src["files"].values() if not (out_dir / name).exists()]
+    if missing:
+        raise SystemExit(
+            f"craigslist: missing {', '.join(missing)} in {out_dir}. Open {src['worksheet']} in a "
+            "browser, save train.json, dev.json and test.json into that folder and run again "
+            "(see data/README.md)."
         )
-        print(f"  craigslist: {filename}")
+    for name in src["files"].values():
+        print(f"  craigslist: {name} (already present)")
 
 
 def download_p4g(src: dict, out_dir: Path, timeout: int) -> None:
@@ -61,7 +65,7 @@ def main() -> None:
     for name in cfg["datasets"]:
         (raw / name).mkdir(parents=True, exist_ok=True)
     print("Downloading raw datasets...")
-    download_craigslist(sources["craigslist"], raw / "craigslist")
+    check_craigslist(sources["craigslist"], raw / "craigslist")
     download_p4g(sources["p4g"], raw / "p4g", cfg["download_timeout_s"])
     download_saas(sources["saas"], raw / "saas")
     print(f"Done. Raw data is in {raw}")
