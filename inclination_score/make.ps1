@@ -32,6 +32,7 @@ switch ($Target) {
     "export" { Invoke-Steps $export }
     "eval" { Invoke-Steps $eval }
     "app" { Invoke-Steps (, @("-m", "streamlit", "run", "app/Home.py")) }
+    "api" { Invoke-Steps (, @("-m", "uvicorn", "api.server:app", "--port", "8000", "--reload")) }
     "test" { Invoke-Steps (, @("-m", "pytest", "-q")) }
     "all" { Invoke-Steps ($data + $train + $export + $eval) }
     default {
