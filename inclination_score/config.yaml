@@ -20,18 +20,19 @@ data:
   inspect_examples: 3          # records printed per dataset by `make inspect` / `make data`
   sources:
     craigslist:
-      # The HF loading script no longer runs and CodaLab's TLS certificate has expired, so we
-      # read Hugging Face's own parquet conversion of the dataset.
-      hf_repo: stanfordnlp/craigslist_bargains
-      hf_revision: refs/convert/parquet
-      files:
-        - default/craigslist_bargains-train.parquet
-        - default/craigslist_bargains-validation.parquet
-        - default/craigslist_bargains-test.parquet
+      # Original CoCoA release: unlike Hugging Face's parquet copy, it has an outcome for every
+      # dialogue. CodaLab's TLS certificate has expired, so `make download` cannot fetch it; save
+      # the three files from the worksheet into data/raw/craigslist/ by hand (data/README.md).
+      worksheet: https://worksheets.codalab.org/worksheets/0x453913e76b65495d8b9730d41c7e0a0c/
+      # id split -> file. The ids keep the HF split names, which follow the same files row by row.
+      files: {train: train.json, validation: dev.json, test: test.json}
+      # Dialogues without dialogue acts in the HF copy. They get their own split, so the 4,462
+      # dialogues used before keep their assignment (and the annotation sample stays in test).
+      recovered_file: data/craigslist_recovered.json
+      recovered_batch: recovered
       customer_role: buyer
-      positive_intent: accept
-      action_intents: [offer, accept, reject, quit]   # structured action turns, always dropped
-      terminal_intents: [accept, quit]                # nothing after these is kept
+      action_events: [offer, accept, reject, quit]   # structured action events, always dropped
+      terminal_events: [accept, quit]                # nothing after these is kept
     p4g:
       customer_flag: 1          # B4 == 1 is the persuadee, B4 == 0 the persuader
       agent_flag: 0

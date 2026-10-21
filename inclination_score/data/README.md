@@ -6,52 +6,62 @@ from the spec.
 
 ## 1. CraigslistBargains (`craigslist`) — real humans
 
-**Source used.** `stanfordnlp/craigslist_bargains` on Hugging Face, branch `refs/convert/parquet`
-(Hugging Face's own parquet conversion). The loading script no longer runs with current
-`datasets`, and the raw CoCoA JSON on CodaLab is unreachable (expired TLS certificate, and the
-server answers HTTP 500 regardless).
+Updated on 2026-10-19 when the source was switched to the original release.
 
-**Structure.** 6,682 dialogues (HF splits: train 5,247 / validation 597 / test 838), one row each:
+**Source used.** The original CoCoA release on the
+[CodaLab worksheet](https://worksheets.codalab.org/worksheets/0x453913e76b65495d8b9730d41c7e0a0c/):
+`train.json`, `dev.json` and `test.json`. CodaLab's TLS certificate has expired, so `make download`
+cannot fetch them. Open the worksheet in a browser, open each of the three files, save it under
+that name in `data/raw/craigslist/`, then run `make data`; `make download` stops with a message
+if a file is missing.
+
+The first version used Hugging Face's parquet conversion (`stanfordnlp/craigslist_bargains`,
+branch `refs/convert/parquet`). It is the same 6,682 dialogues in the same order (HF train /
+validation / test = `train.json` / `dev.json` / `test.json`, checked row by row), but a third of
+them lost their dialogue acts and with them their outcome (see below).
+
+**Structure.** 6,682 dialogues (train 5,247 / dev 597 / test 838), one JSON object each:
 
 | field | content |
 |---|---|
-| `agent_info` | `Role` = `[buyer, seller]` (always index 0 = buyer), private `Target` price per role, `Bottomline` (always `"None"`) |
-| `agent_turn` | list of speaker indices (0 = buyer, 1 = seller), one per turn |
-| `utterance` | list of turn texts; **empty string for structured action turns** |
-| `dialogue_acts` | `intent` and `price` per turn, from the CoCoA rule-based parser |
-| `items` | `Category`, `Title`, `Description`, `Price` (listing price), `Images` |
+| `scenario.kbs` | one entry per agent: `personal` (`Role`, private `Target` price, `Bottomline`) and `item` (`Title`, `Category`, `Price` = listing price, `Description`, `Images`). Index 0 is always the buyer |
+| `events` | one per turn: `agent` (0 or 1, an index into `kbs`), `action` (`message`, `offer`, `accept`, `reject`, `quit`), `data` (the text of a message, the price of an offer, else empty) |
+| `outcome` | `reward` (1 = deal, 0 = no deal) and the final `offer` |
 
-Mean 9.2 turns per dialogue (min 2, max 46). Buyer speaks first in 57%. Six categories: furniture,
-housing, bike, car, electronics, phone.
+Mean 9.2 events per dialogue (min 2, max 46). Buyer speaks first in 57%. Six categories:
+furniture, housing, bike, car, electronics, phone.
 
-**Outcome field.** There is no outcome column. The outcome must be derived from
-`dialogue_acts.intent`: `accept`, `reject`, `quit` (and `offer`) mark the structured action turns.
+**Outcome field.** `outcome.reward`, present for every dialogue: 74.9% are deals.
 
-**Problem: a third of the dialogues have no dialogue acts.** 2,219 dialogues have `intent == ""`
-on every turn: **all 838 of the HF test split**, 1,237 of train and 144 of validation. Their action
-turns are still visible as empty utterances, but an `accept` cannot be told apart from a `reject`,
-so their outcome is unknown. Only **4,463 dialogues are labelled**.
+**Recovered dialogues.** 2,219 dialogues have no dialogue acts in the HF copy (**all 838 of its
+test split**, 1,237 of train and 144 of validation), so their outcome was unknown there and they
+were excluded. Here they are labelled. Their deal rate is 52.9%, against 85.8% for the 4,463
+dialogues that had acts, so the excluded third was mostly where the negatives were. The ids of
+the 2,219 are listed in `data/craigslist_recovered.json`.
 
-Among the 4,463 labelled dialogues:
+For the 4,463 dialogues that had acts, this loader gives exactly the same records as the HF one
+(turns, outcome, title and metadata; checked one by one), so their ids and split do not change.
 
-| ends with | count | planned outcome |
+All 6,682 dialogues by their strongest action event:
+
+| has | count | outcome (`reward`) |
 |---|---|---|
-| `accept` | 3,831 (85.8%) | 1 |
-| `quit` | 216 | 0 |
-| `reject` | 202 | 0 |
-| an `offer` nobody answered | 20 | 0 |
-| no action turn at all (abandoned) | 194 | 0 |
+| `accept` | 5,006 (74.9%) | 1, except one: an `accept` clicked with no offer on the table, scored 0 |
+| `quit` | 579 | 0 |
+| `reject` | 463 | 0 |
+| an `offer` nobody answered | 38 | 0 |
+| no action event at all (abandoned) | 596 | 0 |
+
+`reward` is used as the outcome. On the 4,463 dialogues of the HF copy it always agrees with the
+earlier rule ("an `accept` act exists").
 
 **Leakage risks.**
-- Action turns (`offer`, `accept`, `reject`, `quit`): always an empty utterance, and the `offer`
-  carries the final deal price. All are dropped from the turn table.
-- Action turns are **not always at the end**: in 1,072 dialogues people keep typing after an
-  offer (for example, an offer is rejected and bargaining continues). Those text turns are kept.
-- `dialogue_acts.intent` / `.price` are annotations, not conversation content: never used as
-  features.
-- `agent_info.Target` (private target prices): display metadata only.
-- Utterances contain no system-generated tokens such as `<accept>` in this version; the templated
-  turns are simply empty.
+- Action events (`offer`, `accept`, `reject`, `quit`): never text, and the `offer` carries the
+  final deal price. All are dropped from the turn table.
+- Action events are **not always at the end**: in 1,491 dialogues people keep typing after an
+  action (for example, an offer is rejected and bargaining continues). Those messages are kept.
+- `outcome` (reward and final offer): label only.
+- `kbs[].personal.Target` (private target prices): never read.
 
 ## 2. Persuasion for Good (`p4g`) — real humans
 
@@ -118,14 +128,16 @@ product, product type and channel as display metadata.
 
 Two additions made while building the loaders: anything typed after an `accept` or `quit` in
 Craigslist is dropped too, and conversations left with fewer than `data.min_turns` (2) turns are
-removed (this affected one Craigslist dialogue).
+removed (this affected one Craigslist dialogue of the HF copy, and 351 of the full release: 133
+with no message at all and 218 with one).
 
 | dataset | customer | agent | outcome = 1 | dropped before scoring | conversations kept |
 |---|---|---|---|---|---|
-| `craigslist` | buyer (`agent_turn == 0`) | seller | an `accept` act exists | all `offer` / `accept` / `reject` / `quit` turns; acts, prices, targets | 4,463 labelled (2,219 unlabelled excluded) |
+| `craigslist` | buyer (`kbs[0]`) | seller | `outcome.reward == 1` | all `offer` / `accept` / `reject` / `quit` events; outcome, prices, targets | 6,331 of 6,682 |
 | `p4g` | persuadee (`B4 == 1`) | persuader | persuadee `B6 > 0` (actual donation) | all of `full_info.csv` | 1,017 |
 | `saas` | `customer` | `sales_rep` | `outcome == 1` | `system` messages; every annotation column | 20,000 sampled from 100,000 (seed 42, stratified by outcome) |
 
-The Hugging Face train/validation/test split of Craigslist is ignored: its test split has no
-labels. All three datasets get our own 70/15/15 split by conversation (seed 42, stratified by
-outcome).
+The release's own train/dev/test split of Craigslist is ignored (the HF copy had no labels for
+its test split). All three datasets get our own 70/15/15 split by conversation (seed 42,
+stratified by outcome). The recovered Craigslist dialogues are split on their own, the same way,
+so the 4,462 used before keep their assignment and the annotation sample stays in test.

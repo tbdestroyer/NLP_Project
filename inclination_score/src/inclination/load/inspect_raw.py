@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from inclination.config import load_config, path
+from inclination.config import ROOT, load_config, path
 
 MAX_STR = 400  # display truncation only
 
@@ -39,48 +39,40 @@ def show(name: str, df: pd.DataFrame, n_examples: int) -> None:
 
 
 def inspect_craigslist(raw: Path, n: int) -> None:
-    frames = {p.stem.split("-")[-1]: pd.read_parquet(p) for p in sorted(raw.rglob("*.parquet"))}
-    for split, df in frames.items():
-        no_acts = df["dialogue_acts"].map(lambda a: not any(list(a["intent"])))
-        ends_empty = df["utterance"].map(lambda u: len(u) > 0 and not str(u[-1]).strip())
-        print(f"\ncraigslist split {split}: {len(df):,} dialogues | "
-              f"with NO dialogue acts at all: {no_acts.sum():,} | "
-              f"of those ending in an empty utterance: {(no_acts & ends_empty).sum():,}")
+    src = load_config()["data"]["sources"]["craigslist"]
+    frames = {
+        id_split: pd.DataFrame(json.loads((raw / name).read_text(encoding="utf-8")))
+        for id_split, name in src["files"].items()
+    }
+    recovered = json.loads((ROOT / src["recovered_file"]).read_text(encoding="utf-8"))
+    for id_split, df in frames.items():
+        rewards = df["outcome"].map(lambda o: o["reward"])
+        was_unlabelled = rewards.iloc[recovered[id_split]]
+        print(f"\ncraigslist {src['files'][id_split]} ({id_split} ids): {len(df):,} dialogues | "
+              f"reward=1: {rewards.mean():.3f} | without acts in the HF copy: "
+              f"{len(was_unlabelled):,} (reward=1: {was_unlabelled.mean():.3f})")
     df = pd.concat(frames.values(), ignore_index=True)
-    show("craigslist (all splits)", df, n)
+    show("craigslist (all files)", df, n)
 
-    intents = Counter()
-    last_intent = Counter()
-    empty_with_intent = Counter()
-    for acts, utterances in zip(df["dialogue_acts"], df["utterance"]):
-        seq = list(acts["intent"])
-        intents.update(seq)
-        last_intent[seq[-1] if seq else "<none>"] += 1
-        for intent, text in zip(seq, utterances):
-            if not str(text).strip():
-                empty_with_intent[intent] += 1
-    print("\nintent counts over all turns:", dict(intents.most_common()))
-    print("intent of the LAST turn:", dict(last_intent.most_common()))
-    print("intent of turns with EMPTY utterance:", dict(empty_with_intent.most_common()))
-    print("turns per dialogue:", df["utterance"].map(len).describe().round(2).to_dict())
-    terminal, text_after_action = Counter(), 0
-    for acts in df["dialogue_acts"]:
-        seq = list(acts["intent"])
-        if not any(seq):
-            continue
-        present = set(seq)
-        terminal[next((a for a in ("accept", "reject", "quit", "offer") if a in present), "none")] += 1
-        is_action = [a in ("offer", "accept", "reject", "quit") for a in seq]
+    actions, last_action = Counter(), Counter()
+    accept_vs_reward, text_after_action = Counter(), 0
+    for events, outcome in zip(df["events"], df["outcome"]):
+        seq = [e["action"] for e in events]
+        actions.update(seq)
+        last_action[seq[-1] if seq else "<none>"] += 1
+        accept_vs_reward[("accept" in seq, outcome["reward"])] += 1
+        is_action = [a != "message" for a in seq]
         if True in is_action and not all(is_action[is_action.index(True):]):
             text_after_action += 1
-    labelled = sum(terminal.values())
-    print(f"dialogues WITH acts: {labelled:,} | strongest action act present: {dict(terminal)}")
-    print(f"accept rate among dialogues with acts: {terminal['accept'] / labelled:.3f}")
-    print(f"dialogues with text turns after the first action turn: {text_after_action:,}")
-    print("categories:", dict(Counter(i["Category"][0] for i in df["items"]).most_common()))
+    print("\nevent actions over all events:", dict(actions.most_common()))
+    print("action of the LAST event:", dict(last_action.most_common()))
+    print("(accept event present, reward):", dict(accept_vs_reward))
+    print("events per dialogue:", df["events"].map(len).describe().round(2).to_dict())
+    print(f"dialogues with message events after the first action event: {text_after_action:,}")
+    print("categories:", dict(Counter(s["category"] for s in df["scenario"]).most_common()))
     print("role of first speaker:", Counter(
-        info["Role"][turns[0]] if len(turns) else "<empty>"
-        for info, turns in zip(df["agent_info"], df["agent_turn"])
+        s["kbs"][int(events[0]["agent"])]["personal"]["Role"] if len(events) else "<empty>"
+        for s, events in zip(df["scenario"], df["events"])
     ))
 
 

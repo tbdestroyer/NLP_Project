@@ -11,12 +11,12 @@ use the final-turn score, calibrated on the validation split.
 
 | dataset | model | n | base rate | ROC AUC (95% CI) | PR AUC | Brier | Brier, base-rate baseline | ECE |
 |---|---|---|---|---|---|---|---|---|
-| CraigslistBargains | v1 | 670 | 85.8% | 0.746 (0.698–0.791) | 0.943 | 0.113 | 0.122 | 0.037 |
-| CraigslistBargains | v3 | 670 | 85.8% | 0.880 (0.847–0.910) | 0.974 | 0.099 | 0.122 | 0.053 |
+| CraigslistBargains | v1 | 951 | 77.3% | 0.827 (0.794–0.859) | 0.930 | 0.152 | 0.176 | 0.094 |
+| CraigslistBargains | v3 | 951 | 77.3% | 0.908 (0.887–0.929) | 0.965 | 0.129 | 0.176 | 0.110 |
 | Persuasion for Good | v1 | 153 | 53.6% | 0.616 (0.527–0.701) | 0.636 | 0.247 | 0.249 | 0.074 |
-| Persuasion for Good | v3 | 153 | 53.6% | 0.605 (0.515–0.691) | 0.646 | 0.247 | 0.249 | 0.138 |
+| Persuasion for Good | v3 | 153 | 53.6% | 0.609 (0.514–0.693) | 0.672 | 0.252 | 0.249 | 0.130 |
 | SaaS (synthetic) | v1 | 3,000 | 49.9% | 0.778 (0.762–0.793) | 0.760 | 0.202 | 0.250 | 0.079 |
-| SaaS (synthetic) | v3 | 3,000 | 49.9% | 0.667 (0.648–0.686) | 0.625 | 0.232 | 0.250 | 0.054 |
+| SaaS (synthetic) | v3 | 3,000 | 49.9% | 0.599 (0.580–0.617) | 0.572 | 0.243 | 0.250 | 0.031 |
 
 The majority-class baseline has ROC AUC 0.5 and PR AUC equal to the base rate.
 
@@ -26,12 +26,12 @@ ROC AUC using only the score at the given share of each conversation's turns.
 
 | dataset | model | 10% | 25% | 50% | 75% | 100% |
 |---|---|---|---|---|---|---|
-| CraigslistBargains | v1 | 0.514 | 0.559 | 0.585 | 0.673 | 0.746 |
-| CraigslistBargains | v3 | 0.500 | 0.574 | 0.629 | 0.741 | 0.880 |
+| CraigslistBargains | v1 | 0.488 | 0.614 | 0.732 | 0.789 | 0.827 |
+| CraigslistBargains | v3 | 0.570 | 0.600 | 0.741 | 0.821 | 0.908 |
 | Persuasion for Good | v1 | 0.586 | 0.550 | 0.605 | 0.609 | 0.616 |
-| Persuasion for Good | v3 | 0.552 | 0.543 | 0.572 | 0.602 | 0.605 |
+| Persuasion for Good | v3 | 0.526 | 0.507 | 0.501 | 0.547 | 0.609 |
 | SaaS (synthetic) | v1 | 0.596 | 0.605 | 0.613 | 0.670 | 0.778 |
-| SaaS (synthetic) | v3 | 0.578 | 0.611 | 0.621 | 0.641 | 0.667 |
+| SaaS (synthetic) | v3 | 0.545 | 0.557 | 0.571 | 0.589 | 0.599 |
 
 ![Early prediction, v1](../outputs/figures/early_prediction_v1.png)
 
@@ -43,12 +43,12 @@ Share of the top-ranked test conversations that converted.
 
 | dataset | model | base rate | precision@10 | precision@20 |
 |---|---|---|---|---|
-| CraigslistBargains | v1 | 85.8% | 100% | 100% |
-| CraigslistBargains | v3 | 85.8% | 100% | 100% |
+| CraigslistBargains | v1 | 77.3% | 100% | 100% |
+| CraigslistBargains | v3 | 77.3% | 100% | 100% |
 | Persuasion for Good | v1 | 53.6% | 70% | 70% |
 | Persuasion for Good | v3 | 53.6% | 80% | 80% |
 | SaaS (synthetic) | v1 | 49.9% | 100% | 95% |
-| SaaS (synthetic) | v3 | 49.9% | 90% | 90% |
+| SaaS (synthetic) | v3 | 49.9% | 80% | 80% |
 
 ## 4. Calibration
 
@@ -79,14 +79,14 @@ otherwise, and compared with the label (more / same / less).
 
 | annotator | model | dataset | turns | accuracy | always-"same" accuracy | Cohen's kappa |
 |---|---|---|---|---|---|---|
-| auto_llm (LLM) | v1 | All datasets | 382 | 42.9% | 51.8% | 0.125 |
-| auto_llm (LLM) | v1 | CraigslistBargains | 70 | 50.0% | 37.1% | 0.162 |
+| auto_llm (LLM) | v1 | All datasets | 382 | 45.5% | 51.8% | 0.174 |
+| auto_llm (LLM) | v1 | CraigslistBargains | 70 | 64.3% | 37.1% | 0.336 |
 | auto_llm (LLM) | v1 | Persuasion for Good | 207 | 41.1% | 58.9% | 0.084 |
 | auto_llm (LLM) | v1 | SaaS (synthetic) | 105 | 41.9% | 47.6% | 0.146 |
-| auto_llm (LLM) | v3 | All datasets | 382 | 45.3% | 51.8% | 0.040 |
-| auto_llm (LLM) | v3 | CraigslistBargains | 70 | 44.3% | 37.1% | 0.035 |
-| auto_llm (LLM) | v3 | Persuasion for Good | 207 | 47.3% | 58.9% | 0.005 |
-| auto_llm (LLM) | v3 | SaaS (synthetic) | 105 | 41.9% | 47.6% | -0.029 |
+| auto_llm (LLM) | v3 | All datasets | 382 | 48.2% | 51.8% | 0.081 |
+| auto_llm (LLM) | v3 | CraigslistBargains | 70 | 45.7% | 37.1% | 0.075 |
+| auto_llm (LLM) | v3 | Persuasion for Good | 207 | 50.7% | 58.9% | 0.073 |
+| auto_llm (LLM) | v3 | SaaS (synthetic) | 105 | 44.8% | 47.6% | -0.005 |
 
 ### Turning points
 
@@ -94,22 +94,22 @@ A predicted turning point counts as correct when a labelled one lies within ±1 
 
 | annotator | model | method | dataset | predicted | labelled | precision | recall | F1 |
 |---|---|---|---|---|---|---|---|---|
-| auto_llm (LLM) | v1 | A: score change | All datasets | 24 | 33 | 12% | 9% | 0.11 |
-| auto_llm (LLM) | v1 | A: score change | CraigslistBargains | 0 | 11 | n/a | 0% | n/a |
+| auto_llm (LLM) | v1 | A: score change | All datasets | 32 | 33 | 12% | 12% | 0.12 |
+| auto_llm (LLM) | v1 | A: score change | CraigslistBargains | 8 | 11 | 12% | 9% | 0.11 |
 | auto_llm (LLM) | v1 | A: score change | Persuasion for Good | 17 | 12 | 18% | 25% | 0.21 |
 | auto_llm (LLM) | v1 | A: score change | SaaS (synthetic) | 7 | 10 | 0% | 0% | n/a |
-| auto_llm (LLM) | v1 | B: change point | All datasets | 33 | 33 | 6% | 6% | 0.06 |
-| auto_llm (LLM) | v1 | B: change point | CraigslistBargains | 0 | 11 | n/a | 0% | n/a |
+| auto_llm (LLM) | v1 | B: change point | All datasets | 52 | 33 | 15% | 24% | 0.19 |
+| auto_llm (LLM) | v1 | B: change point | CraigslistBargains | 19 | 11 | 32% | 55% | 0.40 |
 | auto_llm (LLM) | v1 | B: change point | Persuasion for Good | 22 | 12 | 9% | 17% | 0.12 |
 | auto_llm (LLM) | v1 | B: change point | SaaS (synthetic) | 11 | 10 | 0% | 0% | n/a |
-| auto_llm (LLM) | v3 | A: score change | All datasets | 22 | 33 | 14% | 9% | 0.11 |
-| auto_llm (LLM) | v3 | A: score change | CraigslistBargains | 3 | 11 | 33% | 9% | 0.14 |
-| auto_llm (LLM) | v3 | A: score change | Persuasion for Good | 18 | 12 | 11% | 17% | 0.13 |
+| auto_llm (LLM) | v3 | A: score change | All datasets | 39 | 33 | 21% | 18% | 0.19 |
+| auto_llm (LLM) | v3 | A: score change | CraigslistBargains | 14 | 11 | 36% | 36% | 0.36 |
+| auto_llm (LLM) | v3 | A: score change | Persuasion for Good | 24 | 12 | 12% | 17% | 0.14 |
 | auto_llm (LLM) | v3 | A: score change | SaaS (synthetic) | 1 | 10 | 0% | 0% | n/a |
-| auto_llm (LLM) | v3 | B: change point | All datasets | 33 | 33 | 12% | 12% | 0.12 |
-| auto_llm (LLM) | v3 | B: change point | CraigslistBargains | 5 | 11 | 0% | 0% | n/a |
-| auto_llm (LLM) | v3 | B: change point | Persuasion for Good | 23 | 12 | 17% | 33% | 0.23 |
-| auto_llm (LLM) | v3 | B: change point | SaaS (synthetic) | 5 | 10 | 0% | 0% | n/a |
+| auto_llm (LLM) | v3 | B: change point | All datasets | 40 | 33 | 15% | 15% | 0.15 |
+| auto_llm (LLM) | v3 | B: change point | CraigslistBargains | 16 | 11 | 31% | 36% | 0.34 |
+| auto_llm (LLM) | v3 | B: change point | Persuasion for Good | 22 | 12 | 5% | 8% | 0.06 |
+| auto_llm (LLM) | v3 | B: change point | SaaS (synthetic) | 2 | 10 | 0% | 0% | n/a |
 
 ### Agreement between annotators
 
@@ -121,18 +121,18 @@ Turning points found on the test split by the two methods.
 
 | dataset | model | method | points | per conversation | conversations with at least one | share that are rises |
 |---|---|---|---|---|---|---|
-| CraigslistBargains | v1 | A: score change | 14 | 0.02 | 2% | 57% |
-| CraigslistBargains | v1 | B: change point | 25 | 0.04 | 4% | 96% |
-| CraigslistBargains | v3 | A: score change | 141 | 0.21 | 13% | 44% |
-| CraigslistBargains | v3 | B: change point | 104 | 0.16 | 14% | 68% |
+| CraigslistBargains | v1 | A: score change | 267 | 0.28 | 26% | 97% |
+| CraigslistBargains | v1 | B: change point | 586 | 0.62 | 57% | 99% |
+| CraigslistBargains | v3 | A: score change | 483 | 0.51 | 40% | 80% |
+| CraigslistBargains | v3 | B: change point | 603 | 0.63 | 58% | 92% |
 | Persuasion for Good | v1 | A: score change | 105 | 0.69 | 54% | 45% |
 | Persuasion for Good | v1 | B: change point | 160 | 1.05 | 78% | 54% |
-| Persuasion for Good | v3 | A: score change | 107 | 0.70 | 48% | 40% |
-| Persuasion for Good | v3 | B: change point | 141 | 0.92 | 69% | 55% |
+| Persuasion for Good | v3 | A: score change | 180 | 1.18 | 67% | 52% |
+| Persuasion for Good | v3 | B: change point | 191 | 1.25 | 85% | 65% |
 | SaaS (synthetic) | v1 | A: score change | 855 | 0.28 | 26% | 56% |
 | SaaS (synthetic) | v1 | B: change point | 1,462 | 0.49 | 44% | 48% |
-| SaaS (synthetic) | v3 | A: score change | 140 | 0.05 | 4% | 16% |
-| SaaS (synthetic) | v3 | B: change point | 413 | 0.14 | 13% | 9% |
+| SaaS (synthetic) | v3 | A: score change | 47 | 0.02 | 1% | 72% |
+| SaaS (synthetic) | v3 | B: change point | 107 | 0.04 | 3% | 43% |
 
 **Faithfulness** (method A, test split): mean absolute score change when the trigger turn
 is removed and the conversation is re-scored, against removing one random other turn of
@@ -140,12 +140,12 @@ the same conversation. A faithful explanation should move the score much more.
 
 | dataset | model | turning points | trigger removed | random turn removed | ratio | trigger effect is larger | flagged weak |
 |---|---|---|---|---|---|---|---|
-| CraigslistBargains | v1 | 14 | 0.113 | 0.035 | 3.2x | 64% | 29% |
-| CraigslistBargains | v3 | 141 | 0.115 | 0.046 | 2.5x | 65% | 38% |
+| CraigslistBargains | v1 | 263 | 0.172 | 0.026 | 6.6x | 96% | 5% |
+| CraigslistBargains | v3 | 482 | 0.136 | 0.049 | 2.8x | 80% | 14% |
 | Persuasion for Good | v1 | 105 | 0.191 | 0.031 | 6.2x | 98% | 0% |
-| Persuasion for Good | v3 | 107 | 0.162 | 0.044 | 3.7x | 84% | 15% |
+| Persuasion for Good | v3 | 180 | 0.174 | 0.043 | 4.1x | 83% | 23% |
 | SaaS (synthetic) | v1 | 855 | 0.183 | 0.032 | 5.7x | 98% | 0% |
-| SaaS (synthetic) | v3 | 140 | 0.173 | 0.032 | 5.4x | 89% | 7% |
+| SaaS (synthetic) | v3 | 47 | 0.148 | 0.043 | 3.4x | 77% | 19% |
 
 ## 7. Cross-domain transfer
 
@@ -158,17 +158,17 @@ creates ties between scores.
 
 | trained on \ tested on | CraigslistBargains | Persuasion for Good | SaaS (synthetic) |
 |---|---|---|---|
-| CraigslistBargains | **0.752** | 0.597 | 0.593 |
-| Persuasion for Good | 0.581 | **0.616** | 0.572 |
-| SaaS (synthetic) | 0.586 | 0.553 | **0.778** |
+| CraigslistBargains | **0.832** | 0.575 | 0.595 |
+| Persuasion for Good | 0.520 | **0.616** | 0.572 |
+| SaaS (synthetic) | 0.587 | 0.553 | **0.778** |
 
 **v3**
 
 | trained on \ tested on | CraigslistBargains | Persuasion for Good | SaaS (synthetic) |
 |---|---|---|---|
-| CraigslistBargains | **0.884** | 0.616 | 0.616 |
-| Persuasion for Good | 0.584 | **0.605** | 0.524 |
-| SaaS (synthetic) | 0.487 | 0.491 | **0.668** |
+| CraigslistBargains | **0.909** | 0.619 | 0.633 |
+| Persuasion for Good | 0.618 | **0.609** | 0.490 |
+| SaaS (synthetic) | 0.542 | 0.507 | **0.603** |
 
 ## 8. Case studies
 
@@ -179,21 +179,21 @@ Open one in the dashboard with `http://localhost:8501/Conversation_View?conversa
 
 **Confident and correct**
 
-- `craigslist-validation-557` — "VINTAGE SCHWINN COLLEGIATE": final score 99%, converted (10 turns, 0 turning points).
-- `craigslist-validation-371` — "Zenith Trans Oceanic Shortwave Radio Vintage": final score 99%, converted (9 turns, 0 turning points).
-- `craigslist-validation-31` — "MUST SEE!! Beautiful new kitchen and bathroom, Great neighborhood!!!": final score 99%, converted (14 turns, 0 turning points).
+- `craigslist-validation-513` — "Boy's Bike for sale": final score 99%, converted (7 turns, 0 turning points).
+- `craigslist-validation-418` — "White Leather Love Seat": final score 99%, converted (8 turns, 0 turning points).
+- `craigslist-validation-366` — "1975 Argosy/Air Stream Motorhome": final score 99%, converted (7 turns, 1 turning points).
 
 **Confident mistake**
 
-- `craigslist-train-2945` — "Everything is Brand New Home With Nice Yard 说": final score 94%, did not convert (6 turns, 0 turning points).
-- `craigslist-train-1488` — "Adorable Furnished Cottage June 15-Aug 15": final score 94%, did not convert (9 turns, 0 turning points).
-- `craigslist-train-1528` — "Kicker 10" with amp and enclosure": final score 94%, did not convert (8 turns, 0 turning points).
+- `craigslist-train-2983` — "Elswick English Bicycle": final score 1%, converted (10 turns, 2 turning points).
+- `craigslist-train-681` — "+ 60" Panasonic Smart tv +": final score 1%, converted (13 turns, 3 turning points).
+- `craigslist-test-705` — "Patio Table Set with Chairs (Like New)": final score 96%, did not convert (5 turns, 0 turning points).
 
 **Largest turning point**
 
-- `craigslist-train-1832` — "Binox-HD 4-16x binoculars": -44 points at turn 11. Interest dropped right after the agent stating the price.
-- `craigslist-train-1163` — "2003 Chevy Express 3500 Cargo Van": -42 points at turn 10. Interest dropped right after the agent's message.
-- `craigslist-train-4829` — "Charming Pet Friendly Community": +41 points at turn 10. Interest rose after a commitment to go ahead.
+- `craigslist-train-3334` — "2015 Toyota Prius Plug-In Advanced w/HOV": +60 points at turn 16. Interest rose after the customer's reply, following the agent offering a discount.
+- `craigslist-train-2978` — "2015 Honda CRV EX": +53 points at turn 9. Interest rose right after the agent's message.
+- `craigslist-train-4744` — "Couch, loveseat, chair and ottoman": +43 points at turn 12. Interest rose right after the agent stating the price.
 
 ### Persuasion for Good (v1)
 

@@ -6,6 +6,7 @@ from streamlit.testing.v1 import AppTest
 
 from inclination import annotation
 from inclination.config import ROOT, path
+from inclination.load import craigslist
 
 
 def test_sample_is_test_split_only_even_and_deterministic(processed, cfg):
@@ -23,8 +24,12 @@ def test_saved_sample_matches_the_seeded_sample(processed, cfg):
     if not annotation.sample_path().exists():
         pytest.skip("no annotation sample; run `make export` first")
     _, conversations = processed
+    # the sample was drawn before the recovered Craigslist dialogues were added
+    src = cfg["data"]["sources"]["craigslist"]
+    recovered = craigslist.read_recovered(ROOT / src["recovered_file"])
+    original = conversations[~conversations["conversation_id"].isin(recovered)]
     saved = json.loads(annotation.sample_path().read_text(encoding="utf-8"))
-    assert saved == annotation.build_sample(conversations, cfg)
+    assert saved == annotation.build_sample(original, cfg)
 
 
 def test_labels_round_trip_and_latest_save_wins(tmp_path):

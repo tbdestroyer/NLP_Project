@@ -90,9 +90,12 @@ def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8")
     cfg = load_config()
     data_cfg = cfg["data"]
-    all_turns, all_conversations = [], []
+    all_turns, all_conversations, batches = [], [], {}
     for name in data_cfg["datasets"]:
         records = LOADERS[name].load(path("raw") / name, cfg)
+        batches.update(
+            {r["conversation_id"]: r["split_batch"] for r in records if "split_batch" in r}
+        )
         turns, conversations = to_tables(records, data_cfg["min_turns"])
         print(f"{name}: {len(records):,} labelled conversations loaded, "
               f"{len(conversations):,} kept (>= {data_cfg['min_turns']} turns)")
@@ -102,7 +105,7 @@ def main() -> None:
     conversations = pd.concat(all_conversations, ignore_index=True)
 
     assignment = load_or_make_splits(
-        conversations, data_cfg["split_fractions"], cfg["seed"], path("splits")
+        conversations, data_cfg["split_fractions"], cfg["seed"], path("splits"), batches
     )
     conversations["split"] = conversations["conversation_id"].map(assignment)
     conversations = conversations[CONVERSATION_COLUMNS]
