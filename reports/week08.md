@@ -61,9 +61,18 @@
 
 ### Vaibhav Devarapalli
 
-**Contributions:**
+**Contributions:** I built the full-dataset version of the pipeline that I proposed last week and merged it into main. CraigslistBargains now uses the original release from CodaLab instead of the Hugging Face copy, which had no outcome for 2,219 of the 6,682 dialogues. Everything else in Shantanu's pipeline (models, settings, dashboard, the other two datasets) is unchanged.
 
-**GitHub Evidence:**
+**What was done:**
+
+Data: rewrote the Craigslist loader to read the original files. Craigslist goes from 4,462 to 6,331 conversations, and from 95 to 216 no-deals in the test split. The deal rate drops from 85.8% to 77.3%, because the excluded dialogues were mostly no-deals.
+Comparability: the 4,462 dialogues used before come out exactly the same and keep their ids and train/val/test split; the recovered dialogues are split on their own. The annotation sample is unchanged.
+Training and evaluation: reran the pipeline and retrained v1 and v3 on all three datasets. Craigslist test ROC AUC goes from 0.746 to 0.827 (v1) and from 0.880 to 0.908 (v3). Halfway through a conversation it goes from 0.59 to 0.73 (v1) and from 0.63 to 0.74 (v3).
+Caveats: on the same 670 test conversations as before, v1 goes from 0.746 to 0.768, so part of the gain comes from the recovered conversations being easier. Calibration on Craigslist got worse, and SaaS v3 came out at 0.599 against 0.667 with unchanged data (retraining variation).
+Docs and tests: updated the README, PROJECT_EXPLAINER, data notes and report, and the loader tests (81 tests).
+
+**GitHub Evidence:** 8be1d79 Use the full CraigslistBargains release
+Pull request #3, merged into main: https://github.com/tbdestroyer/NLP_Project/pull/3
 
 ## 7. Lean Canvas Changes (If Any)
 
