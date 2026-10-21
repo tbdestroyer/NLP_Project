@@ -56,20 +56,7 @@ While customer chatbots are widespread, poor conversational flow can lead to use
 ### Taner Bulbul
 
 **Contributions:**
-Updated project scope and links to better match objective after meeting tonight: 
-
-Our project focuses on early, trajectory-based purchase prediction in sales conversations. Rather than classifying each message independently, we estimate a turn-by-turn Inclination Score representing the customer’s likelihood of eventually purchasing, then detect important increases or drops and analyze what conversational events may have caused them. The most relevant prior work now includes SalesRLAgent for real-time sales conversion prediction, SalesLLM for buying-intent evaluation in sales dialogue, TRACER for forecasting outcomes from partial dialogue trajectories, DialogueRNN for modeling conversational history, and Emotion-Flip Reasoning for identifying utterances associated with behavioral or emotional shifts. For data, the strongest options are SaaS Sales Conversations as the main conversion dataset, Kapibala Sales Dialogues for turn-level purchase-intent validation, and optionally CraigslistBargain or PersuasionForGood for external validation. This better matches the current proposal than the earlier emotion-recognition-heavy literature.   
-Links:
-- SalesRLAgent: https://arxiv.org/abs/2503.23303
-- SalesLLM: https://arxiv.org/abs/2604.07054
-- TRACER: https://arxiv.org/abs/2607.03974
-- DialogueRNN: https://ojs.aaai.org/index.php/AAAI/article/view/4657
-- Emotion-Flip Reasoning: https://arxiv.org/abs/2306.13959
-- SaaS Sales Conversations: https://huggingface.co/datasets/DeepMostInnovations/saas-sales-conversations
-- Kapibala Sales Dialogues: https://huggingface.co/datasets/kapibala-ai/kapibala-sales-dialogues
-- CraigslistBargain: https://huggingface.co/datasets/stanfordnlp/craigslist_bargains
-- PersuasionForGood: https://convokit.cornell.edu/documentation/persuasionforgood.html
-
+I joined the team meeting and helped discuss the updated project direction and scope. We clarified that the main goal is to compute an inclination score for each stage of a sales conversation, representing how likely the customer is to make a purchase, rather than focusing only on sentiment changes. I also took part in reviewing the first working version of the pipeline, discussing the current results and limitations, and planning next steps around validation, model improvements, and the overall final project structure.
 **GitHub Evidence:**
 
 ### Ayesha Khan
