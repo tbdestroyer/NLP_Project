@@ -57,7 +57,7 @@ While customer chatbots are widespread, poor conversational flow can lead to use
 
 **Contributions:**
 I joined the team meeting and helped discuss the updated project direction and scope. We clarified that the main goal is to compute an inclination score for each stage of a sales conversation, representing how likely the customer is to make a purchase, rather than focusing only on sentiment changes. I also took part in reviewing the first working version of the pipeline, discussing the current results and limitations, and planning next steps around validation, model improvements, and the overall final project structure.
-**GitHub Evidence:**
+**GitHub Evidence:** add29d43870c8fe7f8d70cc994f115d8243cb1f5
 
 ### Ayesha Khan
 
