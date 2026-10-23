@@ -105,6 +105,11 @@ status:
   cooling_trend: -0.05
   trend_window: 3
 
+analyze:                       # scoring a new, uploaded conversation (POST /api/analyze)
+  min_turns: 2
+  max_turns: 200
+  max_chars_per_turn: 2000
+
 insights:
   min_count: 30
   bootstrap_samples: 1000

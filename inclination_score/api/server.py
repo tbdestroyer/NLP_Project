@@ -15,7 +15,9 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import Response
 from pydantic import BaseModel
+from inclination import analyze as analysis
 from inclination.config import load_config
+from inclination.export import BACKENDS
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUTS = Path(os.environ.get("INCLINATION_OUTPUTS", ROOT / "outputs"))
@@ -38,6 +40,20 @@ class TurnLabel(BaseModel):
     role: Literal["agent", "customer"]
     direction: Literal["more", "same", "less"] | None
     turning_point: bool
+
+
+class AnalyzeTurn(BaseModel):
+    role: Literal["agent", "customer"]
+    text: str
+    speaker: str = ""
+
+
+class AnalyzeRequest(BaseModel):
+    dataset: str
+    model: str = "v1"
+    method: Literal["delta", "pelt"] = "delta"
+    title: str = ""
+    turns: list[AnalyzeTurn]
 
 
 class AnnotationSubmission(BaseModel):
@@ -349,3 +365,37 @@ def save_annotations(submission: AnnotationSubmission):
     except OSError as error:
         raise HTTPException(500, f"Could not save annotation labels: {error}") from error
     return {"saved": True, "annotator": annotator, "conversation_id": submission.conversation_id}
+
+
+@lru_cache(maxsize=8)
+def scoring_backend(model: str, dataset: str):
+    """Loads a trained model once. Restart the server after retraining to pick up the new one."""
+    return analysis.load_backend(model, dataset, load_config())
+
+
+@app.get("/api/analyze/models")
+def analyze_models():
+    """Which trained models can score a new conversation, per dataset. Reads outputs/models/ only,
+    so it works before `make export`."""
+    config = load_config()
+    return {
+        dataset: [model for model in analysis.MODELS if BACKENDS[model].available(dataset)]
+        for dataset in config["data"]["datasets"]
+    }
+
+
+@app.post("/api/analyze")
+def analyze_conversation(request: AnalyzeRequest):
+    """Scores an uploaded conversation with a trained model. Nothing is stored."""
+    try:
+        backend = scoring_backend(request.model, request.dataset)
+    except analysis.ModelUnavailable as error:
+        raise HTTPException(400, str(error)) from error
+    except ImportError as error:  # v3 without torch / transformers installed
+        raise HTTPException(400, f"{request.model} needs requirements-ml.txt installed: {error}") from error
+    turns = [turn.model_dump() for turn in request.turns]
+    try:
+        return analysis.analyze(turns, request.dataset, backend, load_config(),
+                                title=request.title, method=request.method)
+    except analysis.InvalidConversation as error:
+        raise HTTPException(422, str(error)) from error

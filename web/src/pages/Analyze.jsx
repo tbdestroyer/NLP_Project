@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, BadgeCheck, FileUp, LoaderCircle, Sparkles, Upload } from 'lucide-react';
-import { analyzeConversation, ANALYZE_IS_PREVIEW } from '../api/client';
+import { analyzeConversation, getAnalyzeModels } from '../api/client';
 import ConversationDetail from '../components/ConversationDetail';
-import { Segmented, useSelection } from '../components/ui';
-import { MODELS } from '../data/taxonomy';
+import { Segmented } from '../components/ui';
+import { DATASETS, MODELS } from '../data/taxonomy';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton, Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/primitives';
 
 const SAMPLE = `Rep: Hi Dana, thanks for making time today. How are you?
@@ -94,13 +94,27 @@ function parse(raw) {
 
 const AGENT_HINT = /^(rep|agent|seller|sales|persuader|bot|assistant|support)/i;
 
+// Each trained model learned from one kind of conversation; the user picks the closest one.
+const DOMAINS = {
+  saas: 'Sales call or chat',
+  craigslist: 'Price negotiation',
+  p4g: 'Persuasion or donation ask',
+};
+const PREFERRED_DOMAIN = 'saas';
+
+const PreviewNote = ({ children }) => <div className="mb-5 flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-950 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-100"><BadgeCheck size={17} className="mt-0.5 shrink-0" /><span>{children}</span></div>;
+
 export default function Analyze() {
-  const selection = useSelection();
-  const availableModels = (selection.server.options[selection.dataset] ?? []).filter((key) => key in MODELS);
+  const [trained, setTrained] = useState(null); // { [dataset]: [models] } from the server
+  const [trainedError, setTrainedError] = useState('');
+  const [dataset, setDataset] = useState(PREFERRED_DOMAIN);
+  const domains = Object.keys(DOMAINS).filter((key) => trained?.[key]?.length);
+  const preview = trained !== null && domains.length === 0;
+  const availableModels = (trained?.[dataset] ?? []).filter((key) => key in MODELS);
   const [raw, setRaw] = useState('');
   const [title, setTitle] = useState('');
   const [inputTab, setInputTab] = useState('paste');
-  const [model, setModel] = useState(selection.model);
+  const [model, setModel] = useState('v1');
   const [roles, setRoles] = useState({}); // speaker -> 'agent' | 'customer'
   const [over, setOver] = useState(false);
   const [status, setStatus] = useState('idle'); // idle | running | done | error
@@ -115,6 +129,12 @@ export default function Analyze() {
     ?? (AGENT_HINT.test(speaker) ? 'agent' : speakers.find((sp) => AGENT_HINT.test(sp)) ? 'customer' : speaker === speakers[0] ? 'agent' : 'customer');
   const hasBothSides = speakers.some((sp) => roleOf(sp) === 'agent') && speakers.some((sp) => roleOf(sp) === 'customer');
 
+  useEffect(() => {
+    getAnalyzeModels().then(setTrained).catch((e) => { setTrainedError(e.message); setTrained({}); });
+  }, []);
+  useEffect(() => {
+    if (domains.length && !domains.includes(dataset)) setDataset(domains[0]);
+  }, [domains.join(','), dataset]);
   useEffect(() => {
     if (availableModels.length && !availableModels.includes(model)) setModel(availableModels[0]);
   }, [availableModels.join(','), model]);
@@ -143,7 +163,7 @@ export default function Analyze() {
     setError('');
     try {
       const out = await analyzeConversation({
-        title, model, turns: turns.map((t) => ({ role: roleOf(t.speaker), text: t.text, speaker: t.speaker })),
+        title, dataset, model, preview, turns: turns.map((t) => ({ role: roleOf(t.speaker), text: t.text, speaker: t.speaker })),
       });
       setResult(out);
       setStatus('done');
@@ -160,8 +180,10 @@ export default function Analyze() {
           <Button variant="outline" size="sm" onClick={() => setStatus('idle')}><ArrowLeft size={15} />Edit conversation</Button>
           <Button variant="ghost" size="sm" onClick={() => { setRaw(''); setTitle(''); setRoles({}); setResult(null); setStatus('idle'); setInputTab('paste'); }}>Analyze another</Button>
         </div>
-        {ANALYZE_IS_PREVIEW && <div className="mb-5 flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-950 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-100"><BadgeCheck size={17} className="mt-0.5 shrink-0" /><span><b>Preview: not connected to the model yet.</b><br />Analyzing new chats isn't connected to the team's models yet, so these numbers come from simple keyword rules in the browser.</span></div>}
-        <ConversationDetail convo={result} />
+        {result.model === 'preview'
+          ? <PreviewNote><b>Preview: no trained model was available.</b><br />These numbers come from simple keyword rules in the browser, not from the team's models.</PreviewNote>
+          : <PreviewNote><b>Scored by the {MODELS[result.model]?.label ?? result.model} model trained on {DATASETS[result.dataset]?.displayLabel ?? DATASETS[result.dataset]?.label ?? result.dataset}.</b><br />Models trained on one kind of conversation transfer poorly to others, so treat the score as a rough guide.</PreviewNote>}
+        <ConversationDetail convo={result} model={result.model} />
       </main>
     );
   }
@@ -169,11 +191,11 @@ export default function Analyze() {
   return (
     <main className="mx-auto max-w-[1080px] px-5 py-8 md:px-8 md:py-12">
       <header className="mx-auto mb-8 max-w-2xl text-center">
-        <Badge variant="outline" className="mb-4 border-primary/20 bg-primary/5 text-primary"><Sparkles size={13} />Conversation preview</Badge>
+        <Badge variant="outline" className="mb-4 border-primary/20 bg-primary/5 text-primary"><Sparkles size={13} />Analyze a conversation</Badge>
         <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">Read the temperature of a new conversation</h1>
-        <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-muted-foreground">Add a conversation to preview its score after each message, likely turning points, and what may have changed the customer's mind.</p>
+        <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-muted-foreground">Add a conversation to see its score after each message, likely turning points, and what may have changed the customer's mind.</p>
       </header>
-      {ANALYZE_IS_PREVIEW && <div className="mx-auto mb-5 flex max-w-3xl items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-950 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-100"><BadgeCheck size={17} className="mt-0.5 shrink-0" /><span><b>Preview: not connected to the model yet.</b><br />Scoring runs in your browser with a stand-in until analysis is connected to the model.</span></div>}
+      {preview && <div className="mx-auto max-w-3xl"><PreviewNote><b>Preview: no trained model found.</b><br />{trainedError ? `The data server did not answer (${trainedError}). Start it with \`make api\`.` : 'Run `make train` in inclination_score/ and restart `make api` to score with the real model.'} Until then, scoring uses keyword rules in your browser.</PreviewNote></div>}
       <div className="mx-auto grid max-w-5xl items-start gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(300px,.8fr)]">
         <Card className="overflow-hidden">
           <CardHeader className="border-b border-border/70"><CardTitle>Add your conversation</CardTitle><p className="text-xs text-muted-foreground">Upload a text, CSV or JSON file—or paste messages below.</p></CardHeader>
@@ -216,8 +238,12 @@ export default function Analyze() {
                 {!hasBothSides && <p className="mt-1 text-xs font-semibold text-rose-700 dark:text-rose-300">Mark at least one speaker as the customer and one as the sales side.</p>}
               </>}
             </div>
-            {availableModels.length > 0 && <div><p className="mb-2 text-xs font-semibold">3. Pick a model</p><Segmented label="Model" value={model} onChange={setModel} options={availableModels.map((key) => ({ value: key, label: MODELS[key].label }))} /></div>}
-            <Button type="button" className="w-full rounded-xl" disabled={turns.length < 2 || !hasBothSides || status === 'running'} onClick={run}>
+            {domains.length > 0 && <div><p className="mb-2 text-xs font-semibold">3. What kind of conversation is it?</p>
+              <Select value={dataset} onValueChange={setDataset}><SelectTrigger aria-label="Conversation type" className="h-10 w-full text-sm"><SelectValue /></SelectTrigger><SelectContent>{domains.map((key) => <SelectItem key={key} value={key}>{DOMAINS[key]}</SelectItem>)}</SelectContent></Select>
+              <p className="mt-1 text-[11px] text-muted-foreground">Uses the model trained on {DATASETS[dataset]?.displayLabel ?? DATASETS[dataset]?.label}.</p>
+              {availableModels.length > 1 && <div className="mt-3"><Segmented label="Model" value={model} onChange={setModel} options={availableModels.map((key) => ({ value: key, label: MODELS[key].label }))} /></div>}
+            </div>}
+            <Button type="button" className="w-full rounded-xl" disabled={turns.length < 2 || !hasBothSides || status === 'running' || trained === null} onClick={run}>
               {status === 'running' ? <><LoaderCircle size={16} className="animate-spin" />Reading the conversation…</> : <><Sparkles size={16} />Score conversation</>}
             </Button>
             {status === 'running' && <div role="status" className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground"><span>Reading the conversation</span><span className="flex gap-1"><i className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary [animation-delay:-.2s]" /><i className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary [animation-delay:-.1s]" /><i className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary" /></span></div>}

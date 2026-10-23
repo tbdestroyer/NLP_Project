@@ -27,7 +27,7 @@ open `train.json`, `dev.json` and `test.json`, and save each under that name in
 make setup     # create .venv and install requirements.txt
 make all       # data -> train -> export -> eval   (about 10 minutes, no GPU, no API key)
 make app       # open the dashboard at http://localhost:8501
-make test      # 81 tests
+make test      # 106 tests
 ```
 
 `make all` is the four steps below in order. Each can be run on its own. The times are for the
@@ -50,7 +50,7 @@ Other targets:
 | `llm` | optional, costs money: Gemini cue tags, v2 rubric scores and rationales. Needs `GEMINI_API_KEY` in a `.env` file. About 4 hours at 10 calls per minute and about $3. Every answer is cached, so a stopped run resumes where it left off |
 | `export-v2` | adds the Gemini results to the dashboard files without redoing v1 and v3; follow with `eval` |
 | `app` | starts the dashboard |
-| `test` | runs the tests: loaders, leakage rule, split rule, scoring, exports, evaluation, dashboard pages, annotation, LLM jobs (with a stub, no network) |
+| `test` | runs the tests: loaders, leakage rule, split rule, scoring, exports, evaluation, dashboard pages, annotation, LLM jobs (with a stub, no network), new-chat analysis and its API |
 
 To add the transformer (v3):
 
@@ -89,6 +89,12 @@ shown. The synthetic dataset carries a badge on every page.
 The first four pages only read files in `outputs/`; they never train a model or call an LLM. If
 a file is missing, the page says which one and which command creates it. The colour theme (cream
 with light green) is set in `.streamlit/config.toml` and `app/common.py`.
+
+**Scoring a new chat.** The React app in `web/` has an Analyze page: upload or paste any chat,
+mark who is the customer, and a trained model (v1 by default) scores it like the datasets, with
+turning points, explanations and a status. It runs through `make api`
+(`POST /api/analyze`, code in `src/inclination/analyze.py`) and stores nothing. Each model knows
+one kind of conversation only, so the page asks which kind it is. Details: [web/README.md](../web/README.md).
 
 ### Annotate (internal tool)
 

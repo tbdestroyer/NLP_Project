@@ -2,7 +2,7 @@
 
 A React and Vite sales workspace for Inclination Score. It reads the same exported pipeline results
 as the Streamlit dashboard (`inclination_score/app/`) and includes a browser-only analysis preview.
-Analyze is intentionally not connected to the model yet.
+Analyze scores an uploaded chat with a trained model through the same data server.
 
 | Screen | What it shows |
 |---|---|
@@ -11,7 +11,7 @@ Analyze is intentionally not connected to the model yet.
 | Conversation | Right-side conversation view with a Recharts score curve, replay, available method/cue controls, overlays, evidence and transcript |
 | Insights | Helpful/harmful agent moves, timing tabs, confidence ranges, data table and transcript examples |
 | Annotate | Focused sample labelling queue with keyboard shortcuts; writes to the same `annotation/labels/<name>.jsonl` files as Streamlit |
-| Analyze | Text/CSV/JSON input with browser-only preview scoring; explicitly not connected to the model |
+| Analyze | Upload or paste a chat (text, CSV or JSON), mark the speakers, pick the kind of conversation, and see its score curve, turning points and status from a trained model |
 
 ## Run it
 
@@ -45,7 +45,7 @@ running while using the dashboard.
 |---|---|
 | Overview, Lead List, Conversation View, Script Insights | **Real** pipeline results from the same Parquet/JSON files used by Streamlit, including `insight_examples.parquet`. |
 | Annotate | The fixed `annotation/sample.json`, transcripts from `turns.parquet`, and append-only `annotation/labels/<name>.jsonl` files. |
-| Analyze new chat | **Preview only.** Keyword rules in the browser (`src/data/scoring.js`), until the server can score new chats. The page labels its results as a preview. |
+| Analyze new chat | A **trained model** in `outputs/models/` (`make train`), through `POST /api/analyze`. Nothing is stored. If the server is down or no model is trained, the page falls back to keyword rules in the browser (`src/data/scoring.js`) and labels the result as a preview. |
 
 `outputs/` is not in git. The API needs `leads.parquet`, `scores.parquet`, `turns.parquet`,
 `cues.parquet`, `turning_points.parquet`, `insights.parquet`, and `insight_examples.parquet`.
@@ -74,15 +74,21 @@ switches between light and dark mode and remembers the choice in this browser.
 | GET | `/api/metrics?dataset=&model=` | `{ roc_auc, roc_auc_ci }` from `metrics.json`, or `null` |
 | GET | `/api/annotations?annotator=&dataset=` | fixed annotation queue and latest saved labels |
 | POST | `/api/annotations` | validates and appends labels to `annotation/labels/<name>.jsonl` |
+| GET | `/api/analyze/models` | `{ [dataset]: [models] }` trained in `outputs/models/`; works before `make export` |
+| POST | `/api/analyze` | scores a new chat; same shape as `/api/conversations/{id}` without an outcome |
 
-### Connecting "Analyze new chat" later
+### Analyze new chat
 
-1. Add `POST /api/analyze` to `server.py`. Body: `{ title, model, turns: [{ role: "agent" | "customer", speaker, text }] }`.
-   It should run the same steps as the export (rule cue tagging, score every prefix with the
-   chosen model, calibration, `delta_turning_points`, `explain_points`, `lead_status`) and return
-   the same shape as `/api/conversations/{id}`.
-2. In `src/api/client.js`, set `ANALYZE_IS_PREVIEW = false`. The browser will then call the API
-   through the same Vite `/api` proxy.
+`POST /api/analyze` takes `{ dataset, model, title, method?, turns: [{ role: "agent" | "customer", speaker, text }] }`.
+`inclination_score/src/inclination/analyze.py` runs the export's steps on that one chat: rule cue
+tagging, a calibrated score after every turn, turning points with explanations and faithfulness,
+and the lead status. v1 and v3 can score new chats; v2 cannot (it needs a paid LLM call per turn).
+Limits (messages, characters per message) are under `analyze:` in `config.yaml`. Models are loaded
+once, so restart `make api` after retraining.
+
+Every model is trained on one dataset and transfers poorly to others (cross-domain ROC AUC
+0.49 to 0.63), so the page asks what kind of conversation it is, defaults to the SaaS model and
+says which model scored the chat.
 
 ## Where things live
 
@@ -90,7 +96,7 @@ switches between light and dark mode and remembers the choice in this browser.
 src/
   api/client.js              the only place that fetches data (all calls go to /api)
   data/taxonomy.js           cue names and phrases (mirror of cues/taxonomy.py)
-  data/scoring.js            stand-in scorer for the Analyze preview (thresholds from config.yaml)
+  data/scoring.js            fallback scorer for Analyze when no trained model is available
   components/ConversationDetail.jsx   shared transcript, Recharts curve and turning points
   components/ui/primitives.jsx        local accessible shadcn-style UI primitives
   pages/                     one file per screen
