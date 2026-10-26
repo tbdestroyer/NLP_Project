@@ -44,7 +44,7 @@ branch: tbulbul_working_branch_1
 
 ### Ayesha Khan
 
-**Contributions:**
+**Contributions:** I liaised with the team to schedule our weekly touchpoint so everyone is up to speed on the progress so far, and to decide on the next steps. Scheduled next meeting for Oct 28th. Also shared status updates with those absent from the meeting. 
 
 **GitHub Evidence:**
 
