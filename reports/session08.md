@@ -1,7 +1,7 @@
 # Weekly Project Report — Week 08
 
 **Team Name:**  
-**Date:**  October 21, 2026
+**Date:**  October 27, 2026
 
 ## Team Members
 
