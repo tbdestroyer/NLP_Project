@@ -38,12 +38,13 @@
 ### Taner Bulbul
 
 **Contributions:**
-
-**GitHub Evidence:**
+I loaded and built the code and run the UI app and used the annotate menu containing annotations for 60 conversations—20 each from Craigslist, P4G, and SaaS. Committed tbulbul1.jsonl file created from the annotate. I also reviewed the latest commits from other team members.
+**GitHub Evidence:** commit code: 8cdbb9a18b0bd35cb578ba04d54c084b26da1186
+branch: tbulbul_working_branch_1
 
 ### Ayesha Khan
 
-**Contributions:**
+**Contributions:** I liaised with the team to schedule our weekly touchpoint so everyone is up to speed on the progress so far, and to decide on the next steps. Scheduled next meeting for Oct 28th. Also shared status updates with those absent from the meeting. 
 
 **GitHub Evidence:**
 
