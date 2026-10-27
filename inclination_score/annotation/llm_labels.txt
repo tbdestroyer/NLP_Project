@@ -1,0 +1,72 @@
+# LLM annotations, made on 2026-10-08. NOT human labels.
+# Made from the transcripts only, following annotation/guidelines.md, without looking at
+# outcomes, model scores or cue tags for these conversations.
+#
+# One line per conversation of annotation/sample.json: C = craigslist, P = p4g, S = saas,
+# numbered in the order of the sample file. Then one token per labelled turn:
+#   <turn><m|s|l>   customer turn: more / same / less inclined than before
+#   a trailing *    the turn is a turning point (a bare "<turn>*" marks an agent turn)
+# Import with: python -m inclination.annotation annotation/llm_labels.txt auto_llm
+
+C01 0m 2s 4m 6m
+C02 0s 2m 4s 6m 8m
+C03 0m 2s 4s 5* 6m
+C04 0m 2m 4s 6m 8m
+C05 0s 2s 4l*
+C06 0s 2m 4m 6s 8m
+C07 0s 2m 4s 6m
+C08 1m 3m 5s
+C09 1m 3s 5s 6* 7m
+C10 1m 3s 5m
+C11 0s 2m 4l 6m* 8m 10m 12m
+C12 0m 2s 3* 4m
+C13 0m 2m 4m
+C14 0m 2s 4l 6m* 8m
+C15 0m 2s 4s 6l* 8l
+C16 0m 2s 4l* 6l
+C17 0m 2s 4s 6m
+C18 0s 2s 4s 6m 7* 8l 9* 10s 12m
+C19 1s 3s 5s 7m*
+C20 1m 3s 5m
+
+P01 1s 3m 5s 7s 9s 11s 13m 15s 17m 19l*
+P02 1s 3s 5s 7s 9m* 11s 13l 15s 17m 19s 21s
+P03 1s 3l* 5s 7m 9m 11s 13l* 15l 17l 19l
+P04 1s 3m 5s 7s 9m 11m 13s 15m 17m 19m 21l*
+P05 1s 3m 5s 7m 9s 11m 13s 15m* 17s 19s
+P06 1m 3s 5s 7m 9m 11m 13s 15s 17s 19s
+P07 1m 3s 5m 7s 9l 11l* 13s 15l 17m 19s
+P08 1s 3s 5s 7s 9s 11l* 13m 14* 15m 17s 19s
+P09 1s 3s 5s 7s 9m 11m 13s 15m 17s 19s
+P10 1s 3s 5s 7s 9l 11l* 13s 15s 17s 19s 21s 23s 25l
+P11 1s 3s 5s 7m 9m 11m 13m 15s 17s 19s
+P12 1s 3s 5m 7l 9s 11s 13s 15m 17s 19s
+P13 1s 3m 5s 7s 9m 11l* 13l 15l 17l 19s 21s
+P14 1m 3s 5s 7l 9m 11m 13s 15l 17l 19m
+P15 1s 3l 5l 7l 9s 11s 13s 15m* 17s 19s
+P16 1s 3s 5s 7s 9m 11s 13s 15m 17m 19s
+P17 1s 3s 5m 7s 9s 11s 13s 15s 17m 19s
+P18 1s 3s 5s 7s 9m 11m 13m 15m 17s 19m 21s
+P19 1s 3s 5l 7m 9s 11s 13s 15s 17s 19l
+P20 1s 3m 5m 7m 9s 11m 13s 15s 17s 19s
+
+S01 1s 3m 5l 7l* 9l
+S02 0s 2m 4s 6s 8l*
+S03 0m 2s 4s 6l* 8l
+S04 0m 2l 4s 6l 8m 10m
+S05 0m 2m 4s 6s 8l* 10l
+S06 0m 2s 4s 6m 8m
+S07 0m 2m 4l 6l 8s 10m
+S08 0m 1s 3s 5m 7s 9s 11l
+S09 0m 1s 4m 5s 7s 9l 11m 12* 13m
+S10 0m 2s 3s 5s 7l 9s 11l
+S11 0m 2s 3s 5l 7s 9l 11m*
+S12 0m 2s 4s 6l 8s 10l* 12l
+S13 0m 2l 4s 6s 8s 10l*
+S14 0m 2s 4s 6l* 8l 10l
+S15 0m 2s 4s 6s 8l
+S16 0m 2s 4m 6s 8l 10l 12m
+S17 0s 2s 4s 6s 8s 10l* 12l
+S18 0s 2m 3s 5s 7s 9m 11l
+S19 0m 2m 4s 6s 8l 10s
+S20 0m 2s 4m 6s 8l 10l

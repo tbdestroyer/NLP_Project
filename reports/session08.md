@@ -8,25 +8,24 @@
 | Name | Email | GitHub Username | Role |
 |---|---|---|---|
 | Taner Bulbul | tbulbul@umd.edu | tbdestroyer | Product Lead / Developer |
-| Ayesha Khan | ayekhan@umd.edu | ayekhan12 | Product Idea / Data Science |
+| Ayesha Khan | ayekhan@umd.edu | ayekhan12 | Product Idea / DS |
 | Namratha Jeetendra | namrath4@umd.edu | namrathajeetendra | |
 | Shantanu Ramavat | sramavat@umd.edu | sramavat-24 | Software Engineer |
 | Vaibhav Devarapalli | gdevarap@umd.edu | vaibhavdevarapalli | |
 
 ## 1. Shipped This Week
 
-- Built and merged a React front end for the existing pipeline results, including Pipeline overview, Leads, Conversation, Script Insights, and Annotate views.
-- Added a read-only API server for the React app to access files in `outputs/`; the Streamlit app and pipeline remain unchanged.
-- Added an "Analyze new chat" page for pasted or uploaded conversations. Its scoring is currently a placeholder, with the intended `POST /api/analyze` endpoint documented for future backend integration.
-- Updated the CraigslistBargains loader to use the original CodaLab release, recovering dialogues without outcomes in the Hugging Face copy. Retrained v1 and v3 on all three datasets and updated related documentation and loader tests.
-- Annotated 60 conversations (20 each from Craigslist, P4G, and SaaS) and saved the resulting `tbulbul1.jsonl` file.
-- Coordinated a team progress meeting and scheduled the next meeting for October 28.
+- Built and merged a React front end in `web/` with Pipeline overview, Leads, Conversation, Script Insights, and Annotate views.
+- Added a read-only data server at `inclination_score/api/server.py` for the React app to read files in `outputs/`; the pipeline and Streamlit app are unchanged.
+- Added an "Analyze new chat" page for pasted or uploaded conversations. It currently uses placeholder scoring and is ready to connect to the documented `POST /api/analyze` endpoint.
+- Updated the CraigslistBargains loader to use the original CodaLab release and retrained v1 and v3 on all three datasets. Related documentation and loader tests were updated (81 tests).
+- Annotated 60 conversations (20 each from Craigslist, P4G, and SaaS) and committed `tbulbul1.jsonl`.
+- Scheduled the next team meeting for October 28.
 
 ## 2. User / Validation Learning
 
-- The updated CraigslistBargains loader uses the original CodaLab release, which includes outcomes missing from the Hugging Face copy.
 - The React interface was tested locally against real pipeline outputs.
-- On the original 670 Craigslist test conversations, v1 ROC AUC changed from 0.746 to 0.768. Craigslist calibration worsened, and SaaS v3 ROC AUC was 0.599 versus 0.667 previously with unchanged data (retraining variation).
+- On the original 670 Craigslist test conversations, v1 ROC AUC changed from 0.746 to 0.768. The report also notes that Craigslist calibration worsened and that SaaS v3 ROC AUC was 0.599 versus 0.667 previously with unchanged data (retraining variation).
 
 ## 3. Metrics Snapshot
 
@@ -40,15 +39,17 @@
 | Craigslist halfway-through ROC AUC, v1 | 0.59 | 0.73 |
 | Craigslist halfway-through ROC AUC, v3 | 0.63 | 0.74 |
 
-On the original 670 Craigslist test conversations, v1 ROC AUC increased from 0.746 to 0.768. Craigslist calibration worsened. SaaS v3 ROC AUC was 0.599 this run versus 0.667 previously, with unchanged data; this was attributed to retraining variation.
+On the original 670 Craigslist test conversations, v1 ROC AUC changed from 0.746 to 0.768. Craigslist calibration worsened. SaaS v3 ROC AUC was 0.599 versus 0.667 previously with unchanged data (retraining variation).
 
 ## 4. Challenges / Blockers
 
-- The "Analyze new chat" page currently uses placeholder scoring and is ready to connect to the documented `POST /api/analyze` backend endpoint.
+- The "Analyze new chat" page uses placeholder scoring and is not yet connected to a backend endpoint.
 - Craigslist calibration worsened.
 - SaaS v3 ROC AUC was 0.599 versus 0.667 previously with unchanged data (retraining variation).
 
 ## 5. Next Week's Goals
+
+
 
 ## 6. Individual Contributions
 
@@ -61,7 +62,7 @@ branch: tbulbul_working_branch_1
 
 ### Ayesha Khan
 
-**Contributions:** I liaised with the team to schedule our weekly touchpoint so everyone is up to speed on the progress so far, and to decide on the next steps. Scheduled next meeting for Oct 28th. Also shared status updates with those absent from the meeting.
+**Contributions:** I liaised with the team to schedule our weekly touchpoint so everyone is up to speed on the progress so far, and to decide on the next steps. Scheduled next meeting for Oct 28th. Also shared status updates with those absent from the meeting. 
 
 **GitHub Evidence:**
 

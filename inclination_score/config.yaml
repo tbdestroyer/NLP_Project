@@ -1,0 +1,156 @@
+# All settings for the Inclination Score pipeline live here (spec rule 9).
+
+seed: 42
+
+paths:
+  raw: data/raw
+  processed: data/processed
+  outputs: outputs
+  figures: outputs/figures
+  splits: data/processed/splits.json
+  annotation_labels: annotation/labels
+  llm_cache: outputs/llm_cache
+  llm_log: outputs/llm_log.jsonl
+
+data:
+  datasets: [craigslist, p4g, saas]
+  split_fractions: {train: 0.70, val: 0.15, test: 0.15}
+  saas_max_conversations: 20000
+  min_turns: 2                 # conversations with fewer turns after leakage removal are dropped
+  inspect_examples: 3          # records printed per dataset by `make inspect` / `make data`
+  sources:
+    craigslist:
+      # Original CoCoA release: unlike Hugging Face's parquet copy, it has an outcome for every
+      # dialogue. CodaLab's TLS certificate has expired, so `make download` cannot fetch it; save
+      # the three files from the worksheet into data/raw/craigslist/ by hand (data/README.md).
+      worksheet: https://worksheets.codalab.org/worksheets/0x453913e76b65495d8b9730d41c7e0a0c/
+      # id split -> file. The ids keep the HF split names, which follow the same files row by row.
+      files: {train: train.json, validation: dev.json, test: test.json}
+      # Dialogues without dialogue acts in the HF copy. They get their own split, so the 4,462
+      # dialogues used before keep their assignment (and the annotation sample stays in test).
+      recovered_file: data/craigslist_recovered.json
+      recovered_batch: recovered
+      customer_role: buyer
+      action_events: [offer, accept, reject, quit]   # structured action events, always dropped
+      terminal_events: [accept, quit]                # nothing after these is kept
+    p4g:
+      customer_flag: 1          # B4 == 1 is the persuadee, B4 == 0 the persuader
+      agent_flag: 0
+      # Original release (the ConvoKit download URL returns 404).
+      base_url: https://gitlab.com/ucdavisnlp/persuasionforgood/-/raw/master/data/FullData
+      files: [full_dialog.csv, full_info.csv]
+    saas:
+      hf_repo: DeepMostInnovations/saas-sales-conversations
+      hf_revision: refs/convert/parquet
+      shard_glob: default/train/*.parquet
+      drop_column_prefix: embedding_   # 3,072 embedding columns (~3 GB) are never downloaded
+      speaker_roles: {customer: customer, sales_rep: agent}   # any other speaker is dropped
+      meta_columns: [company_name, product_name, product_type, communication_channel]
+  download_timeout_s: 120
+
+cues:
+  recent_window: 3             # "counts in the last 3 turns"
+  tfidf_max_features: 5000
+  tfidf_min_df: 2
+  disengagement_max_words: 3   # a customer reply this short, with no question and no other cue
+
+model:
+  dir: outputs/models
+  v1:
+    C: 1.0
+    max_iter: 2000
+    class_weight: balanced
+    top_features: 3            # features listed per turning-point explanation
+  v3:
+    # ModernBERT-base does not fit in the 4 GB of the GTX 1650 Ti at the input lengths needed
+    # (measured), so the spec's fallback model is used. Set `name` to `preferred` on a larger GPU.
+    name: distilroberta-base
+    preferred: answerdotai/ModernBERT-base
+    alternative: microsoft/deberta-v3-base
+    cpu_fallback: distilroberta-base
+    max_length: 512
+    epochs: 3
+    patience: 1                # early stopping on validation AUC
+    batch_size: 16
+    infer_batch_size: 32
+    max_batch_tokens: 4096     # batch size shrinks for long inputs so 4 GB of GPU memory is enough
+    infer_max_batch_tokens: 8192
+    learning_rate: 2.0e-5
+    weight_decay: 0.01
+    warmup_fraction: 0.06
+    max_grad_norm: 1.0
+    amp: false                 # fp16 is ~4x slower than fp32 on the GTX 1650 Ti (measured)
+    max_train_conversations: 4000
+    cpu_max_train_conversations: 500
+    max_val_conversations: 1000
+    score_splits: [val, test]  # v3 scores are exported for these splits only
+    log_every: 100
+  max_prefixes_per_conversation: 8
+  calibration:
+    method: isotonic           # falls back to platt below min_val_conversations
+    min_val_conversations: 200
+    clip: 0.01                 # calibrated scores are kept inside [clip, 1 - clip]
+
+turning:
+  delta_threshold: 0.15
+  # A sustained shift of 0.15 between two segments of 3+ turns lowers the cost by about 0.034,
+  # so this penalty finds shifts of roughly the size method A looks for.
+  pelt_penalty: 0.03
+  pelt_min_size: 2             # a segment lasts at least 2 turns
+  weak_faithfulness_threshold: 0.05
+
+status:
+  hot_final_score: 0.70
+  rising_trend: 0.05
+  cooling_trend: -0.05
+  trend_window: 3
+
+insights:
+  min_count: 30
+  bootstrap_samples: 1000
+  ci_level: 0.95
+  position_buckets: [early, middle, late]
+  n_examples: 3
+
+eval:
+  early_fractions: [0.10, 0.25, 0.50, 0.75, 1.00]
+  precision_at: [10, 20]
+  calibration_bins: 10
+  reliability_min_bin: 10      # bins with fewer conversations are left off the reliability diagram
+  bootstrap_samples: 1000
+  ci_level: 0.95
+  case_studies_per_kind: 3
+  case_study_min_conversations: 100   # a model scored on fewer test conversations is not "best"
+  direction_epsilon: 0.02      # a score change smaller than this counts as "same"
+  turning_point_tolerance: 1   # a predicted turning point matches a labelled one within +/- 1 turn
+
+annotation:
+  n_conversations: 60          # in total, split evenly across the datasets
+  sample_file: annotation/sample.json
+  directions: [more, same, less]
+
+viz:
+  dataset_colors: {craigslist: "#2a78d6", p4g: "#eb6834", saas: "#1baf7a"}
+  dataset_labels: {craigslist: CraigslistBargains, p4g: Persuasion for Good, saas: SaaS (synthetic)}
+  figure_dpi: 160
+
+llm:
+  model: gemini-3.5-flash
+  tagging_model: gemini-3.5-flash-lite
+  temperature: 0
+  rpm: 10
+  max_calls: 3000              # new (uncached) calls per job run
+  max_retries: 5
+  backoff_base_s: 4            # exponential backoff on 429 / 500 / 503: 4, 8, 16, ... seconds
+  # Measured on gemini-3.5-flash for one v2 call: default thinking spends about 500 hidden output
+  # tokens, "low" about 110, "minimal" none. null = model default.
+  thinking_level: low
+  # USD per 1M tokens, paid tier, standard (non-batch), from ai.google.dev/gemini-api/docs/pricing
+  # on 2026-10-08. Batch API prices are half of these.
+  prices_per_million:
+    gemini-3.5-flash: {input: 1.50, output: 9.00}
+    gemini-3.5-flash-lite: {input: 0.30, output: 2.50}
+  tag_sample_size: 300
+  # Spec default is 100; reduced to 30 (approved 2026-10-08) because v2 costs one call per turn.
+  score_sample_size: 30
+  rationale_max_words: 30
