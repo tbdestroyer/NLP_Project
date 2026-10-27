@@ -50,7 +50,7 @@ branch: tbulbul_working_branch_1
 
 ### Namratha Jeetendra
 
-**Contributions:**
+**Contributions:** I built a new React front end for the project (`web/`) that shows the same pipeline results as the Streamlit dashboard, with a redesigned interface. It has a Pipeline overview with leads grouped by status (Hot, Rising, Stalled, Cooling), a Leads view with the same filters as Streamlit, a Conversation view with the score curve, turning points and explanations, a Script Insights view, and the Annotate tool. I added a small read-only data server (`inclination_score/api/server.py`, run with `make api`) so the React app can read the files in `outputs/` without changing the pipeline or the Streamlit app. I also added an "Analyze new chat" page where a new conversation can be pasted or uploaded; for now it uses placeholder scoring and is ready to connect to a backend endpoint (`POST /api/analyze`, documented in `web/README.md`). I ran the pipeline locally to test the UI against real outputs, opened a pull request for team review, and merged it into main after everyone approved.
 
 **GitHub Evidence:**
 
