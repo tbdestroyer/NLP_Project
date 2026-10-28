@@ -11,7 +11,7 @@ Analyze scores an uploaded chat with a trained model through the same data serve
 | Conversation | Right-side conversation view with a Recharts score curve, replay, available method/cue controls, overlays, evidence and transcript |
 | Insights | Helpful/harmful agent moves, timing tabs, confidence ranges, data table and transcript examples |
 | Annotate | Focused sample labelling queue with keyboard shortcuts; writes to the same `annotation/labels/<name>.jsonl` files as Streamlit |
-| Analyze | Upload or paste a chat (text, CSV or JSON), mark the speakers, pick the kind of conversation, and see its score curve, turning points and status from a trained model |
+| Analyze | **One conversation:** upload or paste a chat (text, CSV or JSON), mark the speakers, pick the kind of conversation, and see its score curve, turning points and status from a trained model. **Many conversations:** upload several files (or one file with many chats) and get a ranked lead list (CSV download), script insights and customer signals across the batch, and open any chat for its full detail |
 
 ## Run it
 
@@ -76,6 +76,7 @@ switches between light and dark mode and remembers the choice in this browser.
 | POST | `/api/annotations` | validates and appends labels to `annotation/labels/<name>.jsonl` |
 | GET | `/api/analyze/models` | `{ [dataset]: [models] }` trained in `outputs/models/`; works before `make export` |
 | POST | `/api/analyze` | scores a new chat; same shape as `/api/conversations/{id}` without an outcome |
+| POST | `/api/analyze/batch` | scores many new chats: lead list, every chat's detail, script insights, cue counts, skipped chats |
 
 ### Analyze new chat
 
@@ -88,7 +89,29 @@ once, so restart `make api` after retraining.
 
 Every model is trained on one dataset and transfers poorly to others (cross-domain ROC AUC
 0.49 to 0.63), so the page asks what kind of conversation it is, defaults to the SaaS model and
-says which model scored the chat.
+says which model scored the chat. The model picker shows each model's test ROC AUC for that
+dataset (from `metrics.json`) and preselects the higher one: v1 for sales chats (0.78 vs 0.60 for
+v3), v3 for price negotiations (0.91 vs 0.83).
+
+### Analyze many chats (lead list)
+
+`POST /api/analyze/batch` takes `{ dataset, model, method?, conversations: [{ title, turns }] }` (up
+to `analyze.max_conversations`, 300). All chats are scored in one model pass, so each gets exactly
+the scores it would get on its own. It returns:
+
+- `leads`: one row per chat (`final_score`, `status`, `status_reason`, `n_turning_points`, `curve`, ...),
+  ranked on the page by chance to buy and downloadable as CSV;
+- `conversations`: every chat's detail, the same shape as `POST /api/analyze`;
+- `insights` and `insight_examples`: the Script insights computation (`insights.move_effects`) over
+  the whole batch. A batch is small, so moves seen at least `analyze.batch_insights_min_count` (5)
+  times are shown, with their 95% confidence intervals;
+- `cue_summary`: how many chats show each customer cue and sales move;
+- `skipped`: chats that could not be scored and why (the rest are still scored).
+
+The page accepts several files at once, or one file holding many chats: text with `---` between
+chats (and an optional `# Title` line), CSV with a `conversation_id` column, or JSON
+`[{ title, turns }]`. Speaker roles are guessed from names like "Rep" or "Customer" and can be
+changed for the whole batch. Parsing is in `src/data/transcripts.js`.
 
 ## Where things live
 
@@ -97,7 +120,11 @@ src/
   api/client.js              the only place that fetches data (all calls go to /api)
   data/taxonomy.js           cue names and phrases (mirror of cues/taxonomy.py)
   data/scoring.js            fallback scorer for Analyze when no trained model is available
+  data/transcripts.js        reads uploaded/pasted transcripts (text, CSV, JSON) and guesses roles
   components/ConversationDetail.jsx   shared transcript, Recharts curve and turning points
+  components/LeadViews.jsx   lead cards and score cells (Leads page and batch lead list)
+  components/InsightViews.jsx         move-effect charts and examples (Insights page and batch)
+  components/BatchResults.jsx         batch results: lead list, script insights, customer signals
   components/ui/primitives.jsx        local accessible shadcn-style UI primitives
   pages/                     one file per screen
   styles.css                 Tailwind entry point and global theme tokens

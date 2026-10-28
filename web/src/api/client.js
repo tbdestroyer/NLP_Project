@@ -92,11 +92,28 @@ export async function analyzeConversation({ title, dataset, model, turns, previe
       ...summarise(tagged, scores, points),
     };
   }
-  const response = await fetch(`${API_BASE}/analyze`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, dataset, model, turns }),
-  });
+  return postAnalysis('/analyze', { title, dataset, model, turns });
+}
+
+/**
+ * Analyze many conversations at once: POST /analyze/batch { dataset, model, conversations: [{ title, turns }] }
+ * → { leads[] (with `curve`), conversations{id: detail}, insights[], insight_examples[], cue_summary[], skipped[] }.
+ */
+export const analyzeBatch = ({ dataset, model, conversations }) => (
+  postAnalysis('/analyze/batch', { dataset, model, conversations })
+);
+
+async function postAnalysis(path, body) {
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new Error('The data server did not answer. Start it with `make api` and try again.');
+  }
   if (!response.ok) {
     let detail = '';
     try { detail = (await response.json()).detail; } catch { /* not JSON */ }

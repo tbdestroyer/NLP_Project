@@ -95,7 +95,7 @@ export default function ConversationDetail({ convo, showOutcome = false, model =
         <div className="min-w-0">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <Badge variant="secondary">{names.displayLabel ?? names.label ?? convo.dataset}</Badge>
-            <Badge variant="outline">{n} turns</Badge><Badge variant="outline">{selectedModel}</Badge><Badge variant="outline">{split} split</Badge>
+            <Badge variant="outline">{n} turns</Badge><Badge variant="outline">{selectedModel}</Badge><Badge variant="outline">{split ? `${split} split` : 'Uploaded chat'}</Badge>
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">{convo.title}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{cap(convo.status_reason)}.</p>
@@ -121,7 +121,7 @@ export default function ConversationDetail({ convo, showOutcome = false, model =
         <CardContent className="px-2 pb-3 pt-5 sm:px-5">
           <div className="h-[260px] w-full sm:h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 18, right: 18, left: -18, bottom: 4 }}>
+              <AreaChart data={chartData} margin={{ top: 18, right: 18, left: 0, bottom: 4 }}>
                 <defs><linearGradient id={`inclination-fill-${convo.conversation_id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#2563eb" stopOpacity={0.28} /><stop offset="95%" stopColor="#38bdf8" stopOpacity={0.02} /></linearGradient></defs>
                 <CartesianGrid vertical={false} stroke="hsl(var(--border))" strokeDasharray="4 5" />
                 <XAxis dataKey="turn" tickLine={false} axisLine={false} fontSize={11} tick={{ fill: 'hsl(var(--muted-foreground))' }} />

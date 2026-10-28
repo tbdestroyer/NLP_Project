@@ -94,7 +94,9 @@ with light green) is set in `.streamlit/config.toml` and `app/common.py`.
 mark who is the customer, and a trained model (v1 by default) scores it like the datasets, with
 turning points, explanations and a status. It runs through `make api`
 (`POST /api/analyze`, code in `src/inclination/analyze.py`) and stores nothing. Each model knows
-one kind of conversation only, so the page asks which kind it is. Details: [web/README.md](../web/README.md).
+one kind of conversation only, so the page asks which kind it is. Upload many chats at once
+(`POST /api/analyze/batch`) to get them ranked as a lead list with script insights over the batch.
+Details: [web/README.md](../web/README.md).
 
 ### Annotate (internal tool)
 
