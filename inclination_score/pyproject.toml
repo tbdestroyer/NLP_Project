@@ -13,4 +13,4 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src", "app", "eval"]
+pythonpath = ["src", "app", "eval", "."]

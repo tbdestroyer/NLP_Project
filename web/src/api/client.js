@@ -4,13 +4,11 @@
 // data server in inclination_score/api/server.py (start it with `make api`). In development,
 // Vite forwards every /api request to http://localhost:8000 (see vite.config.js).
 //
-// "Analyze new chat" is not connected yet: analyzeConversation() below scores in the browser
-// with stand-in keyword rules. When the team adds POST /api/analyze to the server, set
-// ANALYZE_IS_PREVIEW to false.
+// "Analyze new chat" scores with a trained model through POST /api/analyze. Only when the server
+// has no trained model (or isn't running) does it fall back to stand-in keyword rules in the browser.
 import { scoreTurns, summarise, tagTurn, turningPoints } from '../data/scoring';
 
 export const API_BASE = import.meta.env.VITE_API_URL || '/api';
-export const ANALYZE_IS_PREVIEW = true;
 
 async function get(path, params = {}) {
   const query = new URLSearchParams(params).toString();
@@ -74,29 +72,53 @@ export async function saveAnnotations(submission) {
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/** GET /analyze/models → { [dataset]: [models...] } that are trained and can score a new chat. */
+export const getAnalyzeModels = () => get('/analyze/models');
+
 /**
- * Analyze a new conversation. PREVIEW ONLY: keyword cue tagger + toy score, in the browser.
- * Future backend: POST /api/analyze { title, model, turns: [{ role, speaker, text }] },
- * returning the same shape as GET /api/conversations/{id}. Switch ANALYZE_IS_PREVIEW to false
- * when the endpoint is ready.
+ * Analyze a new conversation: POST /analyze { title, dataset, model, turns: [{ role, speaker, text }] },
+ * returning the same shape as GET /conversations/{id}. With preview: true, scores in the browser
+ * with a keyword tagger and a toy score instead (no trained model available).
  */
-export async function analyzeConversation({ title, model, turns }) {
-  if (ANALYZE_IS_PREVIEW) {
+export async function analyzeConversation({ title, dataset, model, turns, preview = false }) {
+  if (preview) {
     await wait(900);
     const tagged = turns.map((t, i) => ({ turn: i, role: t.role, speaker: t.speaker, text: t.text, cues: tagTurn(t.role, t.text) }));
-    const scores = scoreTurns(tagged, { prior: model === 'v3' ? 0.25 : 0.05 });
+    const scores = scoreTurns(tagged, { prior: 0.05 });
     const points = turningPoints(tagged, scores);
     return {
       conversation_id: 'uploaded', title: title || 'Uploaded conversation', dataset: 'uploaded',
-      model, outcome: null, n_turns: tagged.length, turns: tagged, scores, turning_points: points,
+      model: 'preview', outcome: null, n_turns: tagged.length, turns: tagged, scores, turning_points: points,
       ...summarise(tagged, scores, points),
     };
   }
-  const response = await fetch(`${API_BASE}/analyze`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, model, turns }),
-  });
-  if (!response.ok) throw new Error(`Analysis failed (${response.status}). Check the data server's terminal.`);
+  return postAnalysis('/analyze', { title, dataset, model, turns });
+}
+
+/**
+ * Analyze many conversations at once: POST /analyze/batch { dataset, model, conversations: [{ title, turns }] }
+ * → { leads[] (with `curve`), conversations{id: detail}, insights[], insight_examples[], cue_summary[], skipped[] }.
+ */
+export const analyzeBatch = ({ dataset, model, conversations }) => (
+  postAnalysis('/analyze/batch', { dataset, model, conversations })
+);
+
+async function postAnalysis(path, body) {
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new Error('The data server did not answer. Start it with `make api` and try again.');
+  }
+  if (!response.ok) {
+    let detail = '';
+    try { detail = (await response.json()).detail; } catch { /* not JSON */ }
+    if (Array.isArray(detail)) detail = detail.map((d) => d.msg).join('; ');
+    throw new Error(detail || `Analysis failed (${response.status}). Check the data server's terminal.`);
+  }
   return response.json();
 }

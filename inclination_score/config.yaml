@@ -105,6 +105,15 @@ status:
   cooling_trend: -0.05
   trend_window: 3
 
+analyze:                       # scoring new, uploaded conversations (POST /api/analyze[/batch])
+  min_turns: 2
+  max_turns: 200
+  max_chars_per_turn: 2000
+  max_conversations: 300       # per batch upload
+  # A batch is much smaller than a test split, so script insights show moves seen this often
+  # (with their confidence intervals) instead of insights.min_count.
+  batch_insights_min_count: 5
+
 insights:
   min_count: 30
   bootstrap_samples: 1000

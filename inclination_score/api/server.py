@@ -6,6 +6,7 @@ Run:  make api      (or: .venv/bin/python -m uvicorn api.server:app --port 8000 
 import json
 import os
 import re
+import threading
 from functools import lru_cache
 from pathlib import Path
 from datetime import datetime, timezone
@@ -15,7 +16,9 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import Response
 from pydantic import BaseModel
+from inclination import analyze as analysis
 from inclination.config import load_config
+from inclination.export import BACKENDS
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUTS = Path(os.environ.get("INCLINATION_OUTPUTS", ROOT / "outputs"))
@@ -38,6 +41,32 @@ class TurnLabel(BaseModel):
     role: Literal["agent", "customer"]
     direction: Literal["more", "same", "less"] | None
     turning_point: bool
+
+
+class AnalyzeTurn(BaseModel):
+    role: Literal["agent", "customer"]
+    text: str
+    speaker: str = ""
+
+
+class AnalyzeRequest(BaseModel):
+    dataset: str
+    model: str = "v1"
+    method: Literal["delta", "pelt"] = "delta"
+    title: str = ""
+    turns: list[AnalyzeTurn]
+
+
+class BatchConversation(BaseModel):
+    title: str = ""
+    turns: list[AnalyzeTurn]
+
+
+class AnalyzeBatchRequest(BaseModel):
+    dataset: str
+    model: str = "v1"
+    method: Literal["delta", "pelt"] = "delta"
+    conversations: list[BatchConversation]
 
 
 class AnnotationSubmission(BaseModel):
@@ -349,3 +378,62 @@ def save_annotations(submission: AnnotationSubmission):
     except OSError as error:
         raise HTTPException(500, f"Could not save annotation labels: {error}") from error
     return {"saved": True, "annotator": annotator, "conversation_id": submission.conversation_id}
+
+
+@lru_cache(maxsize=8)
+def scoring_backend(model: str, dataset: str):
+    """Loads a trained model once. Restart the server after retraining to pick up the new one."""
+    return analysis.load_backend(model, dataset, load_config())
+
+
+# A backend keeps the last scored turns on itself for the faithfulness re-scoring, so two
+# requests must not score with it at the same time.
+_scoring_lock = threading.Lock()
+
+
+def backend_for(model: str, dataset: str):
+    try:
+        return scoring_backend(model, dataset)
+    except analysis.ModelUnavailable as error:
+        raise HTTPException(400, str(error)) from error
+    except ImportError as error:  # v3 without torch / transformers installed
+        raise HTTPException(400, f"{model} needs requirements-ml.txt installed: {error}") from error
+
+
+@app.get("/api/analyze/models")
+def analyze_models():
+    """Which trained models can score a new conversation, per dataset. Reads outputs/models/ only,
+    so it works before `make export`."""
+    config = load_config()
+    return {
+        dataset: [model for model in analysis.MODELS if BACKENDS[model].available(dataset)]
+        for dataset in config["data"]["datasets"]
+    }
+
+
+@app.post("/api/analyze")
+def analyze_conversation(request: AnalyzeRequest):
+    """Scores an uploaded conversation with a trained model. Nothing is stored."""
+    backend = backend_for(request.model, request.dataset)
+    turns = [turn.model_dump() for turn in request.turns]
+    try:
+        with _scoring_lock:
+            return analysis.analyze(turns, request.dataset, backend, load_config(),
+                                    title=request.title, method=request.method)
+    except analysis.InvalidConversation as error:
+        raise HTTPException(422, str(error)) from error
+
+
+@app.post("/api/analyze/batch")
+def analyze_batch(request: AnalyzeBatchRequest):
+    """Scores many uploaded conversations: a lead list, every conversation's detail and script
+    insights over the batch. Conversations that cannot be scored come back in `skipped`.
+    Nothing is stored."""
+    backend = backend_for(request.model, request.dataset)
+    conversations = [conversation.model_dump() for conversation in request.conversations]
+    try:
+        with _scoring_lock:
+            return analysis.analyze_batch(conversations, request.dataset, backend, load_config(),
+                                          method=request.method)
+    except analysis.InvalidConversation as error:
+        raise HTTPException(422, str(error)) from error
