@@ -74,9 +74,19 @@ branch: tbulbul_working_branch_1
 
 ### Shantanu Ramavat
 
-**Contributions:**
+**Contributions:** I integrated the team's work into one branch and finished the Analyze feature, so a user can upload their own sales conversations and get the full pipeline output from a trained model. I merged Namratha's React front end, Ayesha's Analyze work (which connects the Analyze page to `POST /api/analyze`) and the latest main into `shantanu/analyze-feature`, and set it up with Vaibhav's trained v1 and v3 models (pinned to scikit-learn 1.9.1 and transformers 5.20.2, the versions they were saved with). I checked that the setup reproduces his exported scores on all three datasets. I then merged everything into main.
 
-**GitHub Evidence:**
+**What was done:**
+
+- Single chat: the Analyze page scores an uploaded or pasted chat with the trained model and shows the score after every message, the final chance to buy, the customer cues and agent moves, turning points with explanations, and the lead status.
+- Many chats (new): upload several files, or one file holding many chats (text, CSV or JSON), and get a ranked lead list (downloadable as CSV), script insights across the batch (which agent moves help or hurt, with 95% confidence intervals), counts of customer signals, and the full detail of any chat. Chats that can't be scored are listed with the reason, and the rest are still scored. This is a new endpoint, `POST /api/analyze/batch` in `inclination_score/api/server.py`, built on `analyze_batch` in `inclination_score/src/inclination/analyze.py`. It takes up to 300 chats per batch.
+- Model choice: the model picker shows each model's test ROC AUC and preselects the better one. That is v1 for sales chats (SaaS ROC AUC 0.778 vs 0.599 for v3); v3 only wins on price negotiations (Craigslist 0.908 vs 0.827).
+- Code reuse: moved the lead and insight cards out of the Leads and Insights pages into shared components so the batch results can reuse them. Fixed clipped y-axis labels on the score chart.
+- Tests and docs: added tests checking that batch scores match single-chat scores and the exported scores for v1 and v3, plus tests for the new endpoint (118 tests pass). Updated `web/README.md` and `inclination_score/README.md` with the upload formats and the new endpoint, and moved Ayesha's `ANALYZE_README.md` into `inclination_score/`.
+
+**GitHub Evidence:** Commit code: 12b92f3 (batch Analyze), db4083e (README move)
+Merged into main: 16bcb31
+Branch: shantanu/analyze-feature
 
 ### Vaibhav Devarapalli
 
