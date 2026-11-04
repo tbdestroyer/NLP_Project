@@ -43,7 +43,7 @@
 
 ### Ayesha Khan
 
-**Contributions:**
+**Contributions:** Created draft presentation with the outline for what each of the 5 sections needs to cover for our product specifically. Discussed it with the team in the project meeting. Communicated that the next open item for us to cover is user evidence. Also liaising to assign each section to a team member as the agenda for our next week project call.
 
 **GitHub Evidence:**
 
