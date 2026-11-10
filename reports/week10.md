@@ -38,8 +38,10 @@
 ### Taner Bulbul
 
 **Contributions:**
+Last section that we need to do is select roles for presentations which we will do Wednesday during our meeting, and do the user evidence. I have sent emails and text messages to friends and neighbors asking if any of them would be willing to be a user and test the website. 
 
 **GitHub Evidence:**
+No commit evidence for this contribution, evidence includes PII. 
 
 ### Ayesha Khan
 
