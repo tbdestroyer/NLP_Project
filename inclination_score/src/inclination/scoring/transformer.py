@@ -29,6 +29,15 @@ def model_dir(dataset: str) -> Path:
     return ROOT / load_config()["model"]["dir"] / f"{NAME}_{dataset}"
 
 
+def best_device() -> str:
+    """An NVIDIA GPU (cuda), else an Apple silicon GPU (mps), else the CPU."""
+    if torch.cuda.is_available():
+        return "cuda"
+    if torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"
+
+
 def turn_string(role: str, text: str) -> str:
     return f"[{role.upper()}] {text}"
 
@@ -68,7 +77,7 @@ class TransformerScorer:
         self.infer_max_batch_tokens = cfg["infer_max_batch_tokens"]
         self.amp = cfg["amp"]
         self.calibrator = calibrator
-        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = device or best_device()
         self.model.to(self.device)
 
     # ---- encoding -------------------------------------------------------------------------
@@ -187,9 +196,10 @@ def train(part: pd.DataFrame, dataset: str, cfg: dict) -> tuple[TransformerScore
     v3 = cfg["model"]["v3"]
     rng = np.random.default_rng(cfg["seed"])
     torch.manual_seed(cfg["seed"])
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    name = v3["name"] if device == "cuda" else v3["cpu_fallback"]
-    if device == "cpu":
+    device = best_device()
+    on_gpu = device in ("cuda", "mps")  # mps: Apple silicon, same model and sample sizes as cuda
+    name = v3["name"] if on_gpu else v3["cpu_fallback"]
+    if not on_gpu:
         print(f"  WARNING: no GPU found; falling back to {name} on a subsample")
 
     tokenizer = AutoTokenizer.from_pretrained(name)
@@ -200,7 +210,7 @@ def train(part: pd.DataFrame, dataset: str, cfg: dict) -> tuple[TransformerScore
     def pick(split: str, limit: int):
         ids = conversations.loc[conversations["split"] == split, "conversation_id"].to_numpy()
         return ids if len(ids) <= limit else rng.choice(ids, size=limit, replace=False)
-    train_limit = v3["max_train_conversations"] if device == "cuda" else v3["cpu_max_train_conversations"]
+    train_limit = v3["max_train_conversations"] if on_gpu else v3["cpu_max_train_conversations"]
     train_ids, val_ids = pick("train", train_limit), pick("val", v3["max_val_conversations"])
 
     used = part["conversation_id"].isin(set(train_ids) | set(val_ids)).to_numpy()

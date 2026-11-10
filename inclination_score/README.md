@@ -62,6 +62,20 @@ make export
 make eval
 ```
 
+On a Mac with Apple silicon, the standard PyTorch build is enough, and v3 trains and scores on
+the Apple GPU (`mps`) with the same model and sample sizes as on an NVIDIA GPU:
+
+```
+uv pip install --python .venv/bin/python -r requirements-ml.txt
+make train-v3
+make export
+make eval
+```
+
+The device is chosen in this order: NVIDIA GPU (`cuda`), Apple GPU (`mps`), CPU. On the CPU,
+v3 falls back to a 500-conversation training sample per dataset, so its results are not
+comparable to a GPU run.
+
 Everything downloaded stays inside the project folder: raw data in `data/raw/`, Hugging Face
 files in `.cache/huggingface/`, `uv` packages in `.cache/uv/`. All settings (paths, seed,
 thresholds, model names, sample sizes) are in [config.yaml](config.yaml).

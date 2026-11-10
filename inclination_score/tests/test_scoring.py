@@ -99,6 +99,18 @@ def test_transformer_packing_keeps_the_most_recent_turns():
     assert batches == [[0, 1], [2], [3]]
 
 
+@pytest.mark.parametrize("cuda, mps, expected", [
+    (True, True, "cuda"), (True, False, "cuda"), (False, True, "mps"), (False, False, "cpu"),
+])
+def test_transformer_prefers_cuda_then_apple_gpu_then_cpu(monkeypatch, cuda, mps, expected):
+    torch = pytest.importorskip("torch")
+    from inclination.scoring.transformer import best_device
+
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: cuda)
+    monkeypatch.setattr(torch.backends.mps, "is_available", lambda: mps)
+    assert best_device() == expected
+
+
 def test_scores_are_probabilities_one_per_turn(toy_model):
     scores = toy_model.score(BUY)
     assert len(scores) == len(BUY)
