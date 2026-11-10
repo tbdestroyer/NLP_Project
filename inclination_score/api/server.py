@@ -1,5 +1,6 @@
 """Data server for the React UI in web/. It only reads the files `make export` and `make eval`
 write into outputs/, the same files the Streamlit dashboard reads. It never trains or calls an LLM.
+Live mode (/api/live/*) also runs a local Whisper model for speech-to-text.
 
 Run:  make api      (or: .venv/bin/python -m uvicorn api.server:app --port 8000 --reload)
 """
@@ -13,10 +14,12 @@ from datetime import datetime, timezone
 from typing import Literal
 
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import Response
 from pydantic import BaseModel
 from inclination import analyze as analysis
+from inclination import live
 from inclination.config import load_config
 from inclination.export import BACKENDS
 
@@ -67,6 +70,12 @@ class AnalyzeBatchRequest(BaseModel):
     model: str = "v1"
     method: Literal["delta", "pelt"] = "delta"
     conversations: list[BatchConversation]
+
+
+class LiveRequest(BaseModel):
+    dataset: str
+    model: str = "v1"
+    turns: list[AnalyzeTurn]
 
 
 class AnnotationSubmission(BaseModel):
@@ -435,5 +444,91 @@ def analyze_batch(request: AnalyzeBatchRequest):
         with _scoring_lock:
             return analysis.analyze_batch(conversations, request.dataset, backend, load_config(),
                                           method=request.method)
+    except analysis.InvalidConversation as error:
+        raise HTTPException(422, str(error)) from error
+
+
+# ---- Live mode ---------------------------------------------------------------------------------
+
+_transcriber = None
+_transcriber_lock = threading.Lock()
+
+
+def transcriber() -> live.Transcriber:
+    """The one Whisper instance. It is loaded on POST /api/live/load or the first transcription."""
+    global _transcriber
+    with _transcriber_lock:
+        if _transcriber is None:
+            _transcriber = live.Transcriber(load_config())
+        return _transcriber
+
+
+PLAYBOOK_INPUTS = ("leads.parquet", "turns.parquet", "cues.parquet", "scores.parquet")
+
+
+@lru_cache(maxsize=8)
+def _playbook(dataset: str, model: str, modified: tuple) -> dict:
+    config = load_config()
+    leads = pick(load("leads.parquet"), dataset=dataset, model=model)
+    held_out = set(leads.loc[leads["split"].isin(config["live"]["playbook_splits"]), "conversation_id"])
+    keys = ["conversation_id", "turn"]
+    turns = pick(load("turns.parquet"), dataset=dataset)
+    frame = (turns[turns["conversation_id"].isin(held_out)][[*keys, "role", "text"]]
+             .merge(pick(load("cues.parquet"), dataset=dataset, tagger="rules")[[*keys, "cues"]], on=keys)
+             .merge(pick(load("scores.parquet"), dataset=dataset, model=model)[[*keys, "score"]], on=keys))
+    return live.build_playbook(frame, config)
+
+
+def live_playbook(dataset: str, model: str) -> dict | None:
+    """Coaching evidence from the exported outputs, built once per dataset and model (a few
+    seconds) and rebuilt when the outputs change. None when outputs/ has not been exported."""
+    try:
+        return _playbook(dataset, model, tuple(_mtime(name) for name in PLAYBOOK_INPUTS))
+    except HTTPException:
+        return None
+
+
+@app.get("/api/live/status")
+def live_status():
+    return transcriber().status()
+
+
+@app.post("/api/live/load")
+def live_load():
+    """Loads Whisper (downloading it the first time) and warms it up. Takes about 20-30 s."""
+    try:
+        transcriber().load()
+    except Exception as error:
+        raise HTTPException(503, f"The speech model could not be loaded: {error}") from error
+    return transcriber().status()
+
+
+@app.post("/api/live/transcribe")
+async def live_transcribe(request: Request):
+    """One utterance as little-endian float32 mono samples at 16 kHz (the request body) -> text."""
+    body = await request.body()
+    try:
+        audio = live.decode_pcm(body)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    engine = transcriber()
+    try:
+        return await run_in_threadpool(engine.transcribe, audio)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    except Exception as error:
+        raise HTTPException(503, f"Transcription failed: {error}") from error
+
+
+@app.post("/api/live/score")
+def live_score(request: LiveRequest):
+    """The call so far: score after every message (once both sides have spoken) and coaching for
+    the salesperson's next message. Nothing is stored."""
+    backend = backend_for(request.model, request.dataset)
+    turns = [turn.model_dump() for turn in request.turns]
+    playbook = live_playbook(request.dataset, request.model)
+    try:
+        with _scoring_lock:
+            return live.live_update(turns, request.dataset, backend, playbook, load_config())
     except analysis.InvalidConversation as error:
         raise HTTPException(422, str(error)) from error
