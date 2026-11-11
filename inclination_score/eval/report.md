@@ -39,16 +39,19 @@ ROC AUC using only the score at the given share of each conversation's turns.
 
 ## 3. Lead ranking
 
-Share of the top-ranked test conversations that converted.
+Share of the top-ranked test conversations that converted. Calibrated scores often tie
+(many conversations get exactly the same score), so when tied conversations straddle the
+cutoff, the remaining places are filled at the tied group's conversion rate: the expected
+value if ties were broken at random.
 
 | dataset | model | base rate | precision@10 | precision@20 |
 |---|---|---|---|---|
-| CraigslistBargains | v1 | 77.3% | 90% | 95% |
+| CraigslistBargains | v1 | 77.3% | 99% | 98% |
 | CraigslistBargains | v3 | 77.3% | 100% | 100% |
 | Persuasion for Good | v1 | 53.6% | 70% | 70% |
 | Persuasion for Good | v3 | 53.6% | 80% | 80% |
-| SaaS (synthetic) | v1 | 49.9% | 100% | 95% |
-| SaaS (synthetic) | v3 | 49.9% | 60% | 70% |
+| SaaS (synthetic) | v1 | 49.9% | 98% | 96% |
+| SaaS (synthetic) | v3 | 49.9% | 76% | 77% |
 
 ## 4. Calibration
 

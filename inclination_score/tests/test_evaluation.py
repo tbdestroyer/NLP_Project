@@ -81,3 +81,18 @@ def test_metrics_file_has_every_section_and_labels_llm_annotators():
         assert section in metrics
     for annotator in metrics["labels"]["annotators"]:
         assert annotator["kind"] == evaluate.annotator_kind(annotator["annotator"])
+
+
+def test_precision_at_k_breaks_ties_at_the_cutoff_in_expectation():
+    # One clear top lead (a buyer), then four tied leads of which one bought.
+    labels = [1, 0, 1, 0, 0, 0]
+    scores = [0.9, 0.8, 0.8, 0.8, 0.8, 0.1]
+    # Top 3 = the top lead + 2 of the 4 tied leads, which hold 0.25 buyers each on average.
+    assert evaluate.precision_at_k(labels, scores, 3) == pytest.approx((1 + 2 * 0.25) / 3)
+    # The order of tied leads must not matter.
+    assert evaluate.precision_at_k([1, 0, 0, 1, 0, 0], scores, 3) == pytest.approx((1 + 2 * 0.25) / 3)
+    # No ties at the cutoff: a plain top-k share.
+    assert evaluate.precision_at_k(labels, scores, 1) == 1.0
+    assert evaluate.precision_at_k(labels, scores, 5) == pytest.approx(2 / 5)
+    # k larger than the number of leads uses them all.
+    assert evaluate.precision_at_k(labels, scores, 10) == pytest.approx(2 / 6)
