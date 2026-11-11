@@ -1,9 +1,10 @@
 # Inclination Score: project explainer
 
-*For the project group and the professor. Last updated 2026-10-21, after switching
-CraigslistBargains to its full original release and rerunning both models. The Gemini LLM
-features are implemented, but their full run was paused part-way, so no Gemini results are
-reported here.*
+*For the project group and the professor. Last updated 2026-11-11, after adding the first human
+labels to the evaluation and making precision@k independent of tied scores. Model results are
+from 2026-10-21, after switching CraigslistBargains to its full original release and rerunning
+both models. The Gemini LLM features are implemented, but their full run was paused part-way,
+so no Gemini results are reported here.*
 
 ## 1. The project in one paragraph
 
@@ -19,14 +20,15 @@ fine-tuned transformer (v3). Both rank buyers above non-buyers better than chanc
 datasets, but both are weak early in the conversation except on Craigslist. The transformer is
 clearly better on Craigslist (test ROC AUC 0.91 against 0.83), no better on Persuasion for Good
 (0.61 against 0.62) and worse on the synthetic SaaS data (0.60 against 0.78). It is a smaller transformer than
-planned, because of GPU memory (section 8). The dashboard shows both models. The labelling
-tool is ready, but **nobody has labelled anything yet: that is the group's next job**
-(section 8a). The LLM features are coded but have not been run in full.
+planned, because of GPU memory (section 8). The dashboard shows both models. **One person has
+now labelled the 60 annotation conversations**, alongside the earlier LLM annotator; a second
+person is still needed for agreement between people (section 8a). The LLM features are coded but
+have not been run in full.
 
 **The full evaluation is done, and it gives a mixed picture** (section 8). The good news: the
 score ranks buyers above non-buyers, and the explanations point at messages that really drive
 the score. The bad news: the score's turn-by-turn movements and turning points do not agree
-with an annotator's judgement, models do not transfer between datasets, and early prediction is
+with the annotators' judgement (human or LLM), models do not transfer between datasets, and early prediction is
 weak outside Craigslist. The honest summary is "useful for ranking leads at the end of a
 conversation; not yet reliable as a live, message-by-message reading".
 
@@ -153,13 +155,13 @@ The dashboard only reads precomputed files. It never trains a model or calls an 
 | Rule-based cue tagger, v1 model, calibration, turning points (method A), template explanations, insights, export, basic evaluation | **done** |
 | Dashboard: Home, Lead List, Conversation View, Script Insights | **done** (on v1) |
 | Annotation tool and guidelines | **done** |
-| Labels on the 60 conversations | one **LLM** annotator done; human labels **still to do, by us** |
+| Labels on the 60 conversations | one **LLM** annotator and one **human** annotator (`tbulbul1`) done; a second human **still to do** |
 | LLM cue tagger, LLM rubric scorer (v2), LLM rationales | **code done and tested; full run paused** (about a quarter of the cue tagging finished, v2 scoring and rationales not started). Needs a Gemini API key, about 3.5 hours and about $3 |
 | Fine-tuned transformer (v3) | **done**, with `distilroberta-base` instead of ModernBERT-base |
 | Full evaluation and report (change points, faithfulness, cross-domain, calibration, label agreement, case studies) | **done** |
 | Final polish: dashboard checked in real screenshots and fixed, README rewritten as a from-scratch guide | **done** |
 
-**What is left:** human labels on the 60 conversations (section 8a), finishing the Gemini run
+**What is left:** a second person's labels on the 60 conversations (section 8a), finishing the Gemini run
 (`make llm`, then `make export-v2` and `make eval`), and optionally retraining the SaaS
 transformer on all of its training data.
 
@@ -248,12 +250,19 @@ Test split, final-turn score. Full tables are in `eval/report.md`. Test sets hol
 
 | dataset | base rate | model | ROC AUC (95% CI) | PR AUC | Brier (base-rate baseline) | top 10 converted | top 20 converted |
 |---|---|---|---|---|---|---|---|
-| CraigslistBargains | 77.3% | v1 | 0.827 (0.794–0.859) | 0.930 | 0.152 (0.176) | 100% | 100% |
+| CraigslistBargains | 77.3% | v1 | 0.827 (0.794–0.859) | 0.930 | 0.152 (0.176) | 99% | 98% |
 | | | v3 | **0.908** (0.887–0.929) | 0.965 | 0.129 (0.176) | 100% | 100% |
 | Persuasion for Good | 53.6% | v1 | 0.616 (0.527–0.701) | 0.636 | 0.247 (0.249) | 70% | 70% |
 | | | v3 | 0.609 (0.514–0.693) | 0.672 | 0.252 (0.249) | 80% | 80% |
-| SaaS (synthetic) | 49.9% | v1 | **0.778** (0.762–0.793) | 0.760 | 0.202 (0.250) | 100% | 95% |
-| | | v3 | 0.599 (0.580–0.617) | 0.572 | 0.243 (0.250) | 80% | 80% |
+| SaaS (synthetic) | 49.9% | v1 | **0.778** (0.762–0.793) | 0.760 | 0.202 (0.250) | 98% | 96% |
+| | | v3 | 0.599 (0.580–0.617) | 0.572 | 0.243 (0.250) | 76% | 77% |
+
+**Ties in the lead ranking.** Calibration gives many conversations exactly the same score (178
+Craigslist test conversations share the top v1 score). The top-10 and top-20 columns therefore
+fill the last places from a tied group at that group's conversion rate, which is what random
+tie-breaking gives on average. Earlier versions of this table sorted ties in whatever order the
+software left them, so those two columns could change between runs on identical scores (for
+example SaaS v3 showed 60% and 80% for its top 10).
 
 **What the full Craigslist release changed.** The first version used the Hugging Face copy
 (4,462 dialogues, 670 in test, 85.8% deals). With the full release:
@@ -308,7 +317,7 @@ settings so the two versions can be compared.
 - **Early prediction is still weak outside Craigslist.** At the halfway point Craigslist reaches
   0.73 (v1) and 0.74 (v3); the other datasets are between 0.50 and 0.61. Most of the signal
   still arrives in the last quarter of the conversation.
-- Craigslist's 100% in the top 20 is less impressive than it looks, because 77% convert anyway.
+- Craigslist's 98% to 100% in the top 20 is less impressive than it looks, because 77% convert anyway.
 - v1 overfits (train AUC 0.84 to 0.91 against 0.62 to 0.83 on test). Neither model has been tuned.
 
 **Turning points and explanations (threshold 0.15).** v1 is counted over all splits; v3 only
@@ -351,26 +360,42 @@ This is the strongest positive result about the explanations. One caveat: a turn
 defined by a jump at that message, so some effect from removing it is expected by construction.
 The random-turn baseline shows it is specific to that message.
 
-**2. The score's turn-by-turn movements do not match the annotator.** This is the weakest
-result, and it should be reported as such. Against the LLM annotator (there are no human labels):
+**2. The score's turn-by-turn movements do not match the annotators.** This is the weakest
+result, and it should be reported as such. There are two annotators: an LLM (`auto_llm`) and one
+person from the group (`tbulbul1`), each on the same 60 conversations.
 
-- *Direction (up / same / down) on 382 customer turns:* v1 is right 45.5% of the time and v3
-  48.2%. Always answering "same" would be right 51.8% of the time. Cohen's kappa is 0.17 for v1
-  and 0.08 for v3, which is little agreement beyond chance. The one exception is v1 on
-  Craigslist: 64.3% against 37.1% for always "same" (kappa 0.34), but on only 70 turns.
-- *Turning points (within one turn):* precision is 12% to 21% and recall 12% to 24% across both
-  models and both detection methods. The annotator marked 33 turning points; the models marked
-  32 to 52, mostly in different places.
+- *Direction (up / same / down) on 382 customer turns:*
+
+  | annotator | v1 right | v3 right | always "same" right | kappa v1 / v3 |
+  |---|---|---|---|---|
+  | LLM | 45.5% | 48.2% | 51.8% | 0.17 / 0.08 |
+  | human | 41.4% | 53.9% | 57.9% | 0.12 / 0.14 |
+
+  Neither model beats always answering "same", and kappa shows little agreement beyond chance.
+  The one exception, against both annotators, is v1 on Craigslist (64.3% against the LLM and
+  55.7% against the human, where always "same" gives 37.1% and 41.4%), but on only 70 turns.
+- *Turning points (within one turn):* against the LLM, precision is 12% to 21% and recall 12% to
+  24% across both models and both methods. Against the human it is somewhat better: F1 0.17 to
+  0.34, best for v1 with change-point detection (precision 29%, recall 41%). The LLM marked 33
+  turning points and the human 37; the models marked 32 to 52, mostly in different places.
+
+**The annotators also disagree with each other, especially on turning points.** On direction,
+the human and the LLM agree on 65.6% of customer turns (kappa 0.42, moderate agreement). On
+turning points their kappa is only 0.10. So part of the models' poor turn-level result is that
+the task itself is hard to agree on: two careful readers rarely mark the same turning points.
+A second human annotator would show whether that also holds between people.
 
 So the score ranks conversations reasonably by how they end, but the individual ups and downs
 of the curve are not the ones a reader would pick. Possible reasons: the models are trained only
-on final outcomes, never on turn-level judgements; the annotator is an LLM and one annotator;
-and the direction result depends on the ±0.02 band used to call a change "same".
+on final outcomes, never on turn-level judgements; the labels come from one person and one LLM;
+turning points are hard to agree on even for annotators; and the direction result depends on the
+±0.02 band used to call a change "same".
 
-**3. The two turning-point methods disagree with the annotator about equally.** Change-point
-detection (method B) finds more points than the score-jump rule (method A) on most datasets, for
-example 1.05 against 0.69 per conversation on Persuasion for Good with v1. Neither is clearly
-better against the labels (F1 0.12 to 0.19 overall).
+**3. Neither turning-point method is clearly better.** Change-point detection (method B) finds
+more points than the score-jump rule (method A) on most datasets, for example 1.05 against 0.69
+per conversation on Persuasion for Good with v1. Against the LLM labels the two are similar (F1
+0.12 to 0.19 overall). Against the human labels method B does better for v1 (F1 0.34 against
+0.17) and slightly better for v3 (0.23 against 0.18), but these rest on 37 labelled points.
 
 **4. Models do not transfer across domains.** ROC AUC when trained on the row and tested on the
 column (in-domain on the diagonal):
@@ -431,19 +456,24 @@ sensibly in the middle, and whether its turning points are real, we need human j
 Phase 7 then reports how often the score's direction matches the human label, and the precision
 and recall of the model's turning points against the human ones.
 
-**Current state of the labels (2026-10-08): one annotator, and it is an LLM.** No person has
-labelled yet. To have a reference in the meantime, the 60 conversations were labelled by an LLM,
-following the same guidelines and reading only the transcripts, without outcomes, model scores
-or cue tags. The file is `annotation/labels/auto_llm.jsonl`; the readable source is
-`annotation/llm_labels.txt`.
+**Current state of the labels (2026-11-11): two annotators, one human and one LLM.**
 
-- 416 customer turns: 138 more inclined, 207 same, 71 less inclined. 33 turning points.
-- **These must be reported as LLM annotations, not human ones.** Any agreement number computed
-  against them is "agreement with an LLM annotator".
-- They do not give us inter-annotator agreement. If one or two of us label the same 60, we get
-  human labels, human-to-human kappa, and human-to-LLM kappa, which is a stronger result.
-- An LLM annotator may share blind spots with the models being evaluated (for example, leaning
-  on the same surface cues), so agreement with it is weaker evidence than agreement with people.
+| file | annotator | customer turns: more / same / less | turning points |
+|---|---|---|---|
+| `annotation/labels/auto_llm.jsonl` | **LLM** (2026-10-08) | 138 / 207 / 71 | 33 |
+| `annotation/labels/tbulbul1.jsonl` | **human**, from the group (2026-10-22) | 96 / 248 / 72 | 37 |
+
+- The LLM labels were made as a stand-in before anyone had labelled. The LLM followed the same
+  guidelines and read only the transcripts, without outcomes, model scores or cue tags. The
+  readable source is `annotation/llm_labels.txt`.
+- **Report the two separately.** Numbers against `auto_llm` are "agreement with an LLM
+  annotator"; numbers against `tbulbul1` are agreement with one person.
+- Human against LLM: 65.6% agreement on direction (kappa 0.42), kappa 0.10 on turning points
+  (section 8, finding 2).
+- **Still missing: a second human.** Human-to-LLM kappa is not agreement between people. An LLM
+  annotator may share blind spots with the models (for example, leaning on the same surface
+  cues). One more person labelling the same 60 gives human-to-human kappa, which tells us how
+  reliable turn-level labels are at all.
 
 ## 9. Limitations to state up front
 
@@ -503,7 +533,7 @@ Save `train.json`, `dev.json` and `test.json` from the CodaLab worksheet into
 .\make.ps1 export     # scores, cues, turning points, leads, insights into outputs/
 .\make.ps1 eval       # metrics.json, figures, eval/report.md
 .\make.ps1 train-v3   # optional: fine-tune the transformer (about 2.3 hours on a 4 GB GPU, 1.4 on an 8 GB RTX 4070)
-.\make.ps1 test       # 81 tests: loaders, leakage, splits, scoring, outputs, evaluation, dashboard, annotation, LLM jobs
+.\make.ps1 test       # 124 tests: loaders, leakage, splits, scoring, outputs, evaluation, dashboard, annotation, LLM jobs
 .\make.ps1 all        # data, train, export and eval in one go
 .\make.ps1 app        # open the dashboard
 ```
