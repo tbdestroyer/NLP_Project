@@ -52,8 +52,11 @@ git**. Get them one of two ways.
 
 ### Option A: use the team's trained models (fastest, includes v3)
 
-1. Ask the team (Vaibhav trained the models) for the `outputs` zip.
-2. Unzip it into `inclination_score\outputs\`. The folder should then contain `leads.parquet`,
+1. Download `inclination_outputs.zip` (about 0.9 GB) from the team's
+   [shared Google Drive folder](https://drive.google.com/drive/folders/18_RGAzMZ3eU5PQW7AC44bEmEd5HF3HwF).
+   Vaibhav trained the models; ask the team if you can't open the folder.
+2. Unzip it inside `inclination_score\`, not inside `outputs\`. The zip already contains the
+   `outputs\` folder. Afterwards `inclination_score\outputs\` should contain `leads.parquet`,
    `scores.parquet`, `metrics.json`, `models\` and so on.
 3. Install the scikit-learn version the models were saved with, or the v1 models may not load:
 
