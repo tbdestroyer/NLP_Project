@@ -39,16 +39,19 @@ ROC AUC using only the score at the given share of each conversation's turns.
 
 ## 3. Lead ranking
 
-Share of the top-ranked test conversations that converted.
+Share of the top-ranked test conversations that converted. Calibrated scores often tie
+(many conversations get exactly the same score), so when tied conversations straddle the
+cutoff, the remaining places are filled at the tied group's conversion rate: the expected
+value if ties were broken at random.
 
 | dataset | model | base rate | precision@10 | precision@20 |
 |---|---|---|---|---|
-| CraigslistBargains | v1 | 77.3% | 100% | 100% |
+| CraigslistBargains | v1 | 77.3% | 99% | 98% |
 | CraigslistBargains | v3 | 77.3% | 100% | 100% |
 | Persuasion for Good | v1 | 53.6% | 70% | 70% |
 | Persuasion for Good | v3 | 53.6% | 80% | 80% |
-| SaaS (synthetic) | v1 | 49.9% | 100% | 95% |
-| SaaS (synthetic) | v3 | 49.9% | 80% | 80% |
+| SaaS (synthetic) | v1 | 49.9% | 98% | 96% |
+| SaaS (synthetic) | v3 | 49.9% | 76% | 77% |
 
 ## 4. Calibration
 
@@ -67,9 +70,7 @@ Labels cover 60 fixed test-split conversations (`annotation/sample.json`).
 | annotator | kind | conversations | customer turns | more / same / less | turning points |
 |---|---|---|---|---|---|
 | auto_llm | **LLM** | 60 | 416 | 138 / 207 / 71 | 33 |
-
-> **There are no human labels yet.** Every number in this section is agreement with
-> an **LLM annotator**, not with people. Treat it as indicative only.
+| tbulbul1 | **human** | 60 | 416 | 96 / 248 / 72 | 37 |
 
 ### Direction of the score (up / same / down)
 
@@ -87,6 +88,14 @@ otherwise, and compared with the label (more / same / less).
 | auto_llm (LLM) | v3 | CraigslistBargains | 70 | 45.7% | 37.1% | 0.075 |
 | auto_llm (LLM) | v3 | Persuasion for Good | 207 | 50.7% | 58.9% | 0.073 |
 | auto_llm (LLM) | v3 | SaaS (synthetic) | 105 | 44.8% | 47.6% | -0.005 |
+| tbulbul1 (human) | v1 | All datasets | 382 | 41.4% | 57.9% | 0.117 |
+| tbulbul1 (human) | v1 | CraigslistBargains | 70 | 55.7% | 41.4% | 0.178 |
+| tbulbul1 (human) | v1 | Persuasion for Good | 207 | 37.2% | 64.3% | 0.020 |
+| tbulbul1 (human) | v1 | SaaS (synthetic) | 105 | 40.0% | 56.2% | 0.128 |
+| tbulbul1 (human) | v3 | All datasets | 382 | 53.9% | 57.9% | 0.136 |
+| tbulbul1 (human) | v3 | CraigslistBargains | 70 | 51.4% | 41.4% | 0.160 |
+| tbulbul1 (human) | v3 | Persuasion for Good | 207 | 56.5% | 64.3% | 0.136 |
+| tbulbul1 (human) | v3 | SaaS (synthetic) | 105 | 50.5% | 56.2% | -0.033 |
 
 ### Turning points
 
@@ -110,10 +119,28 @@ A predicted turning point counts as correct when a labelled one lies within ±1 
 | auto_llm (LLM) | v3 | B: change point | CraigslistBargains | 16 | 11 | 31% | 36% | 0.34 |
 | auto_llm (LLM) | v3 | B: change point | Persuasion for Good | 22 | 12 | 5% | 8% | 0.06 |
 | auto_llm (LLM) | v3 | B: change point | SaaS (synthetic) | 2 | 10 | 0% | 0% | n/a |
+| tbulbul1 (human) | v1 | A: score change | All datasets | 32 | 37 | 19% | 16% | 0.17 |
+| tbulbul1 (human) | v1 | A: score change | CraigslistBargains | 8 | 17 | 38% | 18% | 0.24 |
+| tbulbul1 (human) | v1 | A: score change | Persuasion for Good | 17 | 14 | 6% | 7% | 0.06 |
+| tbulbul1 (human) | v1 | A: score change | SaaS (synthetic) | 7 | 6 | 29% | 33% | 0.31 |
+| tbulbul1 (human) | v1 | B: change point | All datasets | 52 | 37 | 29% | 41% | 0.34 |
+| tbulbul1 (human) | v1 | B: change point | CraigslistBargains | 19 | 17 | 47% | 53% | 0.50 |
+| tbulbul1 (human) | v1 | B: change point | Persuasion for Good | 22 | 14 | 18% | 29% | 0.22 |
+| tbulbul1 (human) | v1 | B: change point | SaaS (synthetic) | 11 | 6 | 18% | 33% | 0.24 |
+| tbulbul1 (human) | v3 | A: score change | All datasets | 39 | 37 | 18% | 19% | 0.18 |
+| tbulbul1 (human) | v3 | A: score change | CraigslistBargains | 14 | 17 | 43% | 35% | 0.39 |
+| tbulbul1 (human) | v3 | A: score change | Persuasion for Good | 24 | 14 | 4% | 7% | 0.05 |
+| tbulbul1 (human) | v3 | A: score change | SaaS (synthetic) | 1 | 6 | 0% | 0% | n/a |
+| tbulbul1 (human) | v3 | B: change point | All datasets | 40 | 37 | 22% | 24% | 0.23 |
+| tbulbul1 (human) | v3 | B: change point | CraigslistBargains | 16 | 17 | 50% | 47% | 0.48 |
+| tbulbul1 (human) | v3 | B: change point | Persuasion for Good | 22 | 14 | 5% | 7% | 0.06 |
+| tbulbul1 (human) | v3 | B: change point | SaaS (synthetic) | 2 | 6 | 0% | 0% | n/a |
 
 ### Agreement between annotators
 
-Pending: Cohen's kappa between annotators needs at least two annotators, and only one label file exists.
+| annotators | conversations | direction agreement | direction kappa | turning-point kappa |
+|---|---|---|---|---|
+| auto_llm (LLM) vs tbulbul1 (human) | 60 | 65.6% | 0.424 | 0.105 |
 
 ## 6. Turning points and explanation faithfulness
 

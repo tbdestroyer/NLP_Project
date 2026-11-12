@@ -7,8 +7,15 @@ NLP Project setup tracker and team working document.
 - Taner Bulbul - Developer, Product
 - Ayesha Khan - Developer, Data and Evaluation
 - Shantanu Ramavat - Developer, Engineering
-- Random Teammate - Developer, Users and Research
-- Random Teammate - Developer, Operations
+- Namratha Jeetendra - Developer (role to confirm)
+- Vaibhav Devarapalli - Developer (role to confirm)
+
+To run the project on your laptop, follow [`SETUP.md`](SETUP.md).
+
+The project itself lives in [`inclination_score/`](inclination_score/README.md) (pipeline,
+models, Streamlit dashboard, data API) and [`web/`](web/README.md) (React sales workspace).
+Start with [`inclination_score/PROJECT_EXPLAINER.md`](inclination_score/PROJECT_EXPLAINER.md);
+results are in [`inclination_score/eval/report.md`](inclination_score/eval/report.md).
 
 ## 2) Company Name
 

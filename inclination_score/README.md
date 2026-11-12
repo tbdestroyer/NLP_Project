@@ -27,7 +27,7 @@ open `train.json`, `dev.json` and `test.json`, and save each under that name in
 make setup     # create .venv and install requirements.txt
 make all       # data -> train -> export -> eval   (about 10 minutes, no GPU, no API key)
 make app       # open the dashboard at http://localhost:8501
-make test      # 106 tests
+make test      # 142 tests
 ```
 
 `make all` is the four steps below in order. Each can be run on its own. The times are for the
@@ -61,6 +61,20 @@ make train-v3
 make export
 make eval
 ```
+
+On a Mac with Apple silicon, the standard PyTorch build is enough, and v3 trains and scores on
+the Apple GPU (`mps`) with the same model and sample sizes as on an NVIDIA GPU:
+
+```
+uv pip install --python .venv/bin/python -r requirements-ml.txt
+make train-v3
+make export
+make eval
+```
+
+The device is chosen in this order: NVIDIA GPU (`cuda`), Apple GPU (`mps`), CPU. On the CPU,
+v3 falls back to a 500-conversation training sample per dataset, so its results are not
+comparable to a GPU run.
 
 Everything downloaded stays inside the project folder: raw data in `data/raw/`, Hugging Face
 files in `.cache/huggingface/`, `uv` packages in `.cache/uv/`. All settings (paths, seed,
@@ -106,12 +120,14 @@ customer turn the annotator picks more / same / less inclined, and can mark any 
 point. Labels go to `annotation/labels/<annotator>.jsonl`; any number of annotators can work side
 by side. Instructions and three worked examples: [annotation/guidelines.md](annotation/guidelines.md).
 
-**The only labels so far are LLM annotations, not human ones.** `annotation/labels/auto_llm.jsonl`
-was produced by an LLM from the transcripts alone (no outcomes, scores or cues), following the
-guidelines. Its readable source is `annotation/llm_labels.txt`; re-import it with
-`python -m inclination.annotation annotation/llm_labels.txt auto_llm`. Results computed
-against it must be described as agreement with an LLM annotator. Once human label files exist,
-`make eval` adds human agreement and agreement between annotators to the report.
+**There are two label files: one human, one LLM.** `annotation/labels/tbulbul1.jsonl` is one
+group member's labels. `annotation/labels/auto_llm.jsonl` was produced earlier by an LLM from the
+transcripts alone (no outcomes, scores or cues), following the guidelines. Its readable source is
+`annotation/llm_labels.txt`; re-import it with
+`python -m inclination.annotation annotation/llm_labels.txt auto_llm`. `make eval` reports
+agreement with each annotator separately and between annotators; results against `auto_llm`
+must be described as agreement with an LLM annotator. A second human label file would add
+agreement between people.
 
 ## How it works
 
@@ -167,12 +183,15 @@ How outcomes and leakage are handled:
 
 | dataset | base rate | model | ROC AUC (95% CI) | AUC at 50% of turns | precision@20 |
 |---|---|---|---|---|---|
-| CraigslistBargains | 77.3% | v1 | 0.827 (0.794–0.859) | 0.732 | 100% |
+| CraigslistBargains | 77.3% | v1 | 0.827 (0.794–0.859) | 0.732 | 98% |
 | | | v3 | **0.908** (0.887–0.929) | 0.741 | 100% |
 | Persuasion for Good | 53.6% | v1 | 0.616 (0.527–0.701) | 0.605 | 70% |
 | | | v3 | 0.609 (0.514–0.693) | 0.501 | 80% |
-| SaaS (synthetic) | 49.9% | v1 | **0.778** (0.762–0.793) | 0.613 | 95% |
-| | | v3 | 0.599 (0.580–0.617) | 0.571 | 80% |
+| SaaS (synthetic) | 49.9% | v1 | **0.778** (0.762–0.793) | 0.613 | 96% |
+| | | v3 | 0.599 (0.580–0.617) | 0.571 | 77% |
+
+Many conversations get exactly the same calibrated score, so precision@20 fills its last places
+from a tied group at that group's conversion rate (the average under random tie-breaking).
 
 - **Ranking by outcome works, modestly.** Both models beat chance on every dataset. v3 clearly
   helps on Craigslist, ties on Persuasion for Good and is worse than v1 on SaaS.
@@ -185,9 +204,13 @@ How outcomes and leakage are handled:
   0.50 and 0.61.
 - **Explanations are faithful.** Removing the trigger turn moves the score 2.8 to 6.6 times more
   than removing a random turn of the same conversation.
-- **Turn-level movements do not match the annotator.** Against the LLM annotator, the score's
-  direction is right 46% (v1) and 48% (v3) of the time, below the 52% of always answering "same"
-  (kappa 0.17 and 0.08). Turning-point precision and recall are between 12% and 24%.
+- **Turn-level movements do not match the annotators.** Against the human annotator, the score's
+  direction is right 41% (v1) and 54% (v3) of the time, below the 58% of always answering "same"
+  (kappa 0.12 and 0.14); against the LLM annotator, 46% and 48% against 52% (kappa 0.17 and
+  0.08). Turning-point F1 is 0.17 to 0.34 against the human and 0.12 to 0.19 against the LLM.
+- **Annotators disagree too, mostly on turning points.** The human and the LLM agree on 66% of
+  directions (kappa 0.42) but hardly on turning points (kappa 0.10), so the task itself is hard
+  to agree on.
 - **No cross-domain transfer.** Off-diagonal ROC AUC is 0.49 to 0.63; the transformer trained
   on synthetic SaaS data is close to chance on both real datasets.
 - **v3 was retrained for all three datasets** on an RTX 4070 Laptop GPU (8 GB) with the same
@@ -211,8 +234,8 @@ Full tables, reliability diagrams and case studies: [eval/report.md](eval/report
   RTX 4070 Laptop GPU but kept the same model and settings, so the two versions can be compared.
 - **No LLM results.** v2 rubric scores, the LLM cue tagger and LLM rationales are built but not
   yet run in full, so nothing here depends on them.
-- **No human labels.** The agreement results rest on one LLM annotator, so there is no
-  inter-annotator agreement, and an LLM may share blind spots with the models.
+- **One human annotator.** The agreement results rest on one person and one LLM, so there is
+  no agreement between people yet, and an LLM may share blind spots with the models.
 - **The score is not reliable turn by turn.** It ranks conversations by how they end, but its
   individual rises, drops and turning points do not match a reader's judgement.
 - **Small and imbalanced test sets.** Persuasion for Good has 153 test conversations, so its
