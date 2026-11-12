@@ -103,6 +103,40 @@ export const analyzeBatch = ({ dataset, model, conversations }) => (
   postAnalysis('/analyze/batch', { dataset, model, conversations })
 );
 
+// ---- Live mode ----------------------------------------------------------------------------------
+
+/** GET /live/status → { installed, loaded, model, device, error } for the speech model. */
+export const getLiveStatus = () => get('/live/status');
+
+/** POST /live/load → loads Whisper (downloads it the first time) and warms it up; slow. */
+export const loadSpeechModel = () => postAnalysis('/live/load', {});
+
+/** POST /live/transcribe with one utterance (16 kHz float32 samples) → { text, duration_s, elapsed_s }. */
+export async function transcribe(audio) {
+  let response;
+  try {
+    response = await fetch(`${API_BASE}/live/transcribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: audio.buffer.slice(audio.byteOffset, audio.byteOffset + audio.byteLength),
+    });
+  } catch {
+    throw new Error('The data server did not answer. Start it with `make api` and try again.');
+  }
+  if (!response.ok) {
+    let detail = '';
+    try { detail = (await response.json()).detail; } catch { /* not JSON */ }
+    throw new Error(detail || `Transcription failed (${response.status}).`);
+  }
+  return response.json();
+}
+
+/**
+ * POST /live/score { dataset, model, turns } → { ready, message, dropped_turns, turns[], detail, coach }:
+ * the call so far scored (detail has the shape of GET /conversations/{id}) and what to say next.
+ */
+export const scoreLive = ({ dataset, model, turns }) => postAnalysis('/live/score', { dataset, model, turns });
+
 async function postAnalysis(path, body) {
   let response;
   try {

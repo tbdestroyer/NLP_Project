@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { HashRouter, Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { BarChart3, Menu, Moon, Sun, Users, WandSparkles, Workflow, X } from 'lucide-react';
+import { BarChart3, Menu, Moon, Radio, Sun, Users, WandSparkles, Workflow, X } from 'lucide-react';
 import { DataGate, Mark, SelectionBar, SelectionProvider, useSelection } from './components/ui';
 import {
   Button, Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DropdownMenu,
@@ -11,6 +11,7 @@ const Annotate = lazy(() => import('./pages/Annotate'));
 const Conversation = lazy(() => import('./pages/Conversation'));
 const Insights = lazy(() => import('./pages/Insights'));
 const Leads = lazy(() => import('./pages/Leads'));
+const Live = lazy(() => import('./pages/Live'));
 const Overview = lazy(() => import('./pages/Overview'));
 
 const NAVIGATION = [
@@ -18,6 +19,7 @@ const NAVIGATION = [
   { to: '/leads', label: 'Leads', icon: Users },
   { to: '/insights', label: 'Insights', icon: BarChart3 },
   { to: '/analyze', label: 'Analyze', icon: WandSparkles },
+  { to: '/live', label: 'Live', icon: Radio },
 ];
 
 function LiveStatus() {
@@ -83,7 +85,7 @@ function TopBar({ theme, setTheme }) {
         </div>
         <div className="border-t border-border/70 px-5 py-2 xl:hidden"><SelectionBar /></div>
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-2 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 backdrop-blur-lg lg:hidden">
-          <nav aria-label="Mobile navigation" className="mx-auto grid max-w-lg grid-cols-4 gap-1">
+          <nav aria-label="Mobile navigation" className="mx-auto grid max-w-lg grid-cols-5 gap-1">
             {NAVIGATION.map(({ to, label, icon: Icon, end }) => (
               <NavLink key={to} to={to} end={end} className={({ isActive }) => (
                 `flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold ${isActive || (location.pathname.startsWith('/conversations') && to === '/leads') ? 'text-primary' : 'text-muted-foreground'}`
@@ -137,6 +139,7 @@ function AppLayout({ theme, setTheme }) {
             <Route path="/insights" element={<Suspense fallback={<PageFallback />}><DataGate><Insights /></DataGate></Suspense>} />
             <Route path="/annotate" element={<Suspense fallback={<PageFallback />}><Annotate /></Suspense>} />
             <Route path="/analyze" element={<Suspense fallback={<PageFallback />}><Analyze /></Suspense>} />
+            <Route path="/live" element={<Suspense fallback={<PageFallback />}><Live /></Suspense>} />
             <Route path="/conversations/*" element={<Suspense fallback={<PageFallback />}><DataGate><Leads /></DataGate></Suspense>} />
             <Route path="*" element={<Suspense fallback={<PageFallback />}><DataGate><Overview /></DataGate></Suspense>} />
           </Routes>
