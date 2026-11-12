@@ -533,7 +533,7 @@ Save `train.json`, `dev.json` and `test.json` from the CodaLab worksheet into
 .\make.ps1 export     # scores, cues, turning points, leads, insights into outputs/
 .\make.ps1 eval       # metrics.json, figures, eval/report.md
 .\make.ps1 train-v3   # optional: fine-tune the transformer (about 2.3 hours on a 4 GB GPU, 1.4 on an 8 GB RTX 4070)
-.\make.ps1 test       # 124 tests: loaders, leakage, splits, scoring, outputs, evaluation, dashboard, annotation, LLM jobs
+.\make.ps1 test       # 142 tests: loaders, leakage, splits, scoring, outputs, evaluation, dashboard, annotation, LLM jobs, Live mode
 .\make.ps1 all        # data, train, export and eval in one go
 .\make.ps1 app        # open the dashboard
 ```

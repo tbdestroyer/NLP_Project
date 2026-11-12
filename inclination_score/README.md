@@ -27,7 +27,7 @@ open `train.json`, `dev.json` and `test.json`, and save each under that name in
 make setup     # create .venv and install requirements.txt
 make all       # data -> train -> export -> eval   (about 10 minutes, no GPU, no API key)
 make app       # open the dashboard at http://localhost:8501
-make test      # 124 tests
+make test      # 142 tests
 ```
 
 `make all` is the four steps below in order. Each can be run on its own. The times are for the
