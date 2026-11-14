@@ -57,4 +57,4 @@ user_evidence/YYYY-MM-DD_userN/
 
 | Date | Participant | Folder | Tasks completed |
 |---|---|---|---|
-| | | | |
+| 2026-11-14 | user1 | [Session folder](2026-11-14_user1/) | Not established; see notes |

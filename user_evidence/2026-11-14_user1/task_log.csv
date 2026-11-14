@@ -1,0 +1,6 @@
+session_date,participant_id,product_version,task_id,completed,seconds_to_complete,errors_or_confusion,quotes_or_notes
+2026-11-14,user1,,T1,,,"Relied on high percentages","Selected top three"
+2026-11-14,user1,,T2,,,"Uncertain where interest dropped","Identified a price objection at turn five"
+2026-11-14,user1,,T3,,,"Needed direction to Analyze and was unsure how to interpret the score","Proctor guided participant"
+2026-11-14,user1,,T4,,,"No entries appeared under What hurts","Found helpful moves"
+2026-11-14,user1,,T5,,,"Unsure how Live would be used","Additional task; proctor guided participant to demo option"

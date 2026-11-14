@@ -16,7 +16,7 @@
 ## 1. Shipped This Week
 
 - Ran one moderated usability session covering five app tasks. The
-  [cleaned transcript](../user_evidence/week11_user_testing_transcript.txt) is in `user_evidence/`.
+  [cleaned transcript](../user_evidence/2026-11-14_user1/transcript.txt) is in `user_evidence/`.
 
 
 ## 2. User / Validation Learning
@@ -39,7 +39,7 @@
 ## 3. Metrics Snapshot
 
 - Qualitative usability sessions: 1; tasks attempted: 5.
-- No quantitative completion, timing, or success-rate measures were collected.
+- The transcript does not record task timings or establish a completion or success rate.
 - The participant reported slow page loading and difficulty scrolling.
 
 
@@ -69,7 +69,7 @@ transcript, and documented the findings, usability challenges, and follow-up goa
 Week 11 report.
 
 **GitHub Evidence:** [Week 11 report](week11.md) and
-[cleaned transcript](../user_evidence/week11_user_testing_transcript.txt).
+[cleaned transcript](../user_evidence/2026-11-14_user1/transcript.txt).
 
 ### Ayesha Khan
 
