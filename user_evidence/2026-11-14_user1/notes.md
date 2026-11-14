@@ -7,8 +7,8 @@ during it.
 - **Participant:** user1, outside the project team; role/background not recorded.
 - **Product version / commit:** Not recorded.
 - **Setup:** Not recorded.
-- **Recording or screenshots:** A screen recording exists but has not been committed. See
-  [transcript.txt](transcript.txt) for the cleaned transcript.
+- **Recording:** [Screen recording](https://drive.google.com/file/d/1OPCQSKgaoy59mgmNdPks_SGYtZxYsQ0_/view?usp=sharing).
+  See [transcript.txt](transcript.txt) for the cleaned transcript.
 
 ## Tasks given
 
