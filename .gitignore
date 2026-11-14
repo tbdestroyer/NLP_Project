@@ -1,0 +1,5 @@
+# macOS Finder metadata
+.DS_Store
+
+# Team model outputs zip (download from the shared Drive folder, see SETUP.md)
+inclination_outputs.zip

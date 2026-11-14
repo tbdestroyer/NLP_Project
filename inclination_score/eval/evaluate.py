@@ -59,6 +59,20 @@ def scores_at_fraction(scores: pd.DataFrame, fraction: float) -> pd.Series:
     return scores[scores["turn"] == index].set_index("conversation_id")["score"]
 
 
+def precision_at_k(labels: np.ndarray, scores: np.ndarray, k: int) -> float:
+    """Share of the k highest-scored conversations that converted, with ties at the cutoff
+    broken at random (in expectation). Calibrated scores tie often, so a plain sort would let
+    the order of tied conversations decide the result."""
+    labels, scores = np.asarray(labels, dtype=float), np.asarray(scores, dtype=float)
+    k = min(k, len(scores))
+    if k == 0:
+        return float("nan")
+    cutoff = np.sort(scores)[::-1][k - 1]
+    above, tied = scores > cutoff, scores == cutoff
+    slots = k - int(above.sum())  # places in the top k left for the tied conversations
+    return float((labels[above].sum() + slots * labels[tied].mean()) / k)
+
+
 def evaluate_outcome(scores: pd.DataFrame, leads: pd.DataFrame, cfg: dict, rng) -> dict:
     """`scores`: test-split turn scores with n_turns; `leads`: matching test-split leads."""
     eval_cfg = cfg["eval"]
@@ -73,7 +87,6 @@ def evaluate_outcome(scores: pd.DataFrame, leads: pd.DataFrame, cfg: dict, rng) 
     for fraction in eval_cfg["early_fractions"]:
         at = scores_at_fraction(scores, fraction)
         early[f"{fraction:.2f}"] = float(roc_auc_score(outcome.loc[at.index], at))
-    ranked = leads.sort_values("final_score", ascending=False)["outcome"].to_numpy()
     bins = reliability_bins(labels, final, eval_cfg["calibration_bins"])
     return {
         "n_conversations": int(len(leads)),
@@ -91,7 +104,7 @@ def evaluate_outcome(scores: pd.DataFrame, leads: pd.DataFrame, cfg: dict, rng) 
             "brier": base_rate * (1 - base_rate),  # always predicting the base rate
         },
         "early_auc": early,
-        "precision_at": {str(k): float(ranked[:k].mean()) for k in eval_cfg["precision_at"]},
+        "precision_at": {str(k): precision_at_k(labels, final, k) for k in eval_cfg["precision_at"]},
     }
 
 
@@ -438,7 +451,10 @@ def write_report(metrics: dict, figures: dict, cfg: dict, target) -> None:
         "",
         "## 3. Lead ranking",
         "",
-        "Share of the top-ranked test conversations that converted.",
+        "Share of the top-ranked test conversations that converted. Calibrated scores often tie",
+        "(many conversations get exactly the same score), so when tied conversations straddle the",
+        "cutoff, the remaining places are filled at the tied group's conversion rate: the expected",
+        "value if ties were broken at random.",
         "",
         "| dataset | model | base rate | " + " | ".join(f"precision@{k}" for k in ks) + " |",
         "|---|---|---|" + "---|" * len(ks),

@@ -114,6 +114,27 @@ analyze:                       # scoring new, uploaded conversations (POST /api/
   # (with their confidence intervals) instead of insights.min_count.
   batch_insights_min_count: 5
 
+live:                          # Live mode: transcribe a call, score it and coach (/api/live/*)
+  # Local speech-to-text. small.en transcribes an 8 s sentence in about 0.9 s on the GTX 1650 Ti
+  # with 1.1 GB of GPU memory (measured); base.en is faster and less accurate, medium.en needs more memory.
+  whisper_model: openai/whisper-small.en
+  device: auto                 # cuda when available, else cpu
+  max_new_tokens: 200
+  max_utterance_s: 30          # Whisper reads at most 30 s at a time; the page cuts utterances at 20 s
+  min_utterance_s: 0.3
+  min_rms: 0.002               # quieter audio is treated as silence and not transcribed
+  # The coaching playbook: how the next customer reply's score moved after each agent move, per
+  # customer cue, over these held-out splits (the models never trained on them).
+  playbook_splits: [val, test]
+  min_count: 20                # a (cue, move) pair seen fewer times is not used
+  # Ranking pulls a move's difference from the typical reply towards zero by count / (count + this),
+  # so a move seen 20 times needs a much larger difference than one seen 2,000 times.
+  shrinkage: 50
+  max_suggestions: 3
+  max_avoid: 2
+  n_examples: 2                # real agent lines shown per suggestion
+  max_example_chars: 240
+
 insights:
   min_count: 30
   bootstrap_samples: 1000
