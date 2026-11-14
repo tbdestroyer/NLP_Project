@@ -3,9 +3,9 @@
 These notes were reconstructed from the cleaned transcript after the session, not recorded
 during it.
 
-- **Date and time:** 2026-11-14; time not recorded in the transcript.
-- **Participant:** user1, outside the project team; role/background not recorded.
-- **Product version / commit:** Not recorded.
+- **Date and time:** 2026-11-14
+- **Participant:** user1, outside the project team
+- **Product version / commit:** Development version
 - **Setup:** Not recorded.
 - **Recording or screenshots:** A screen recording exists but has not been committed. See
   [transcript.txt](transcript.txt) for the cleaned transcript.
