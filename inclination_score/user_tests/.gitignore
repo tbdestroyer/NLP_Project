@@ -1,0 +1,4 @@
+/test_cases/*
+!/test_cases/.gitkeep
+/transcripts/*
+!/transcripts/.gitkeep

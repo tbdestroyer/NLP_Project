@@ -1,0 +1,198 @@
+USER TESTING SESSION — CLEANED TRANSCRIPT
+
+Speakers:
+Proctor = person running the test
+User = participant using the app
+
+Note: This version has been cleaned for readability. Obvious transcription errors,
+repetition, and filler have been reduced, but the participant's meaning and testing
+outcomes have been preserved.
+
+------------------------------------------------------------
+INTRODUCTION
+------------------------------------------------------------
+
+Proctor: Thanks for helping. This is a tool for sales managers. I'll give you a few
+short tasks. We're testing the app, not you, so there are no wrong answers. Please
+think out loud as you go. I can't help during the tasks, but you can ask questions
+at the end.
+
+------------------------------------------------------------
+TASK 1 — FIND THE HOTTEST LEADS
+------------------------------------------------------------
+
+Proctor: Find the three leads most likely to buy, and tell me why each one looks good.
+
+User: Okay. Leads here. Find three leads most likely to buy and tell me why each one
+looks good. Okay, so that's the hot ones. Should be one, two, and three.
+
+Proctor: And tell me why each one looks good.
+
+User: Because the percentages are high. I guess it shows they're likely to buy.
+
+Proctor: Okay, let's move on.
+
+------------------------------------------------------------
+TASK 2 — FIND WHERE INTEREST DROPPED
+------------------------------------------------------------
+
+Proctor: Open any conversation and show me the moment the customer started losing
+interest.
+
+User: Okay. I can click something here. Post open, I guess.
+
+User: Okay, that took a while. All right, here's the conversation. What am I finding
+here?
+
+Proctor: Show me the moment the customer started losing interest.
+
+User: Losing interest... Rise... this is a turning point. Plus, plus... There's really
+not any... there's a price objection here from the buyer. So that's turn five. That's
+the only thing I can find.
+
+Proctor: Okay, let's move on.
+
+------------------------------------------------------------
+TASK 3 — SCORE A NEW CHAT
+------------------------------------------------------------
+
+Proctor: Imagine you just finished this sales chat. Use the app to tell me if this
+customer is likely to buy.
+
+User: This customer, the one that I looked at?
+
+Proctor: No, just the app in general. Not necessarily this conversation.
+
+User: Okay. I'm trying to close this. Am I still in the leads? I can't scroll on this
+one. It's slow. The entire page is slow.
+
+User: Let me go down a little bit more. These are all like 99%. I can only tell if
+someone's likely to buy by going by the percentage, but everything is like 99%.
+
+User: Okay, so it goes down further down the list. That's how I would see customers
+likely to buy, from the hot list with high percentages.
+
+Proctor: You're supposed to use the Analyze page.
+
+User: What do you want me to do with it?
+
+Proctor: Use this sales chat and use the app to tell me if the customer is likely to buy.
+
+User: Okay, Analyze. I'm going to paste text. Score the conversation.
+
+User: Okay. Well, the final score is one, so I'm assuming it says no.
+
+User: At the end it looks positive, but the analysis is getting negative, so I don't know.
+
+Proctor: Okay.
+
+------------------------------------------------------------
+TASK 4 — WHAT WORKS IN A SALES PITCH
+------------------------------------------------------------
+
+Proctor: Which things a salesperson does seem to help the sale most, and which things
+seem to hurt?
+
+User: Do you know where I go? Insights, maybe? I'll go to Insights.
+
+User: There's a bunch of "What helps" here: builds rapport, addresses objection, asks
+questions, explains benefit. But there's nothing on the "What hurts" list for this
+group, so I don't know why.
+
+Proctor: Okay.
+
+------------------------------------------------------------
+TASK 5 — COACH A LIVE CALL
+------------------------------------------------------------
+
+Proctor: Last one. Watch this sales call. Tell me what the salesperson should say next,
+and whether the customer is warming up or cooling off.
+
+User: What do I do? "Type, or play a demo"? There are two options here.
+
+Proctor: You can use the "Type, or play a demo" option instead of a microphone.
+
+User: So it's done? No? I don't know. "Start talking to score..." Let's end.
+
+User: I don't have a call. So how do I exit this? Call ended. Go back to Live. Download...
+I don't know. New code? Okay.
+
+User: Oh, here. There's a "Play a demo call."
+
+[Demo call plays]
+
+Demo Salesperson: Hi Jordan. Thanks for making time today. How's your week going?
+
+Demo Customer: Busy, honestly. We're trying to sort out our support tooling.
+
+Demo Salesperson: Got it. What's the biggest headache with your current setup?
+
+Demo Customer: Tickets get lost between email and chat, and our response times are
+slipping.
+
+Demo Salesperson: Our platform puts email, chat, and phone in one queue, so nothing
+slips through.
+
+Demo Customer: That sounds useful. How much is it for about 30 agents?
+
+Demo Salesperson: It's $45 per agent per month, plus a one-time onboarding fee.
+
+Demo Customer: That's more than we budgeted. I'm not sure we can justify it.
+
+Demo Salesperson: I understand. Teams your size usually cut response times by a third
+in the first month, which pays for the seats.
+
+Demo Customer: Okay, that's interesting. Do you have a case study I could share with my
+manager?
+
+Demo Salesperson: Absolutely. I'll send you one from a similar company today.
+
+Demo Customer: Great. What would the next steps be if we wanted to try it?
+
+Demo Salesperson: We can set up a two-week pilot this Friday. Shall I send the invite?
+
+Demo Customer: Sounds good. Send it over.
+
+User: Hmm. Okay. But this looks like the SaaS example. It didn't choose a demo from
+there. I don't know how it chose the demo.
+
+User: I don't really understand what the Live demo is supposed to do in a live chat.
+
+Proctor: Okay.
+
+------------------------------------------------------------
+POST-SESSION QUESTIONS
+------------------------------------------------------------
+
+Proctor: What was the most useful?
+
+User: I guess Insights may be useful to tell what increases things. And Analyze, like
+picking a conversation and showing the points where the conversation increased or
+decreased the interest.
+
+User: This was a little slow opening things. Some of the clicks are slow.
+
+User: Analyze is useful if you want to analyze some other conversation or something
+you captured.
+
+Proctor: What was most confusing?
+
+User: I don't know. A lot of stuff is confusing there. I don't understand all the
+numbers or what the meanings are at the top.
+
+User: The Insights page didn't show anything under "What hurts," so I don't know if
+that's in general, if it's based on everything listed here, or if it's evaluated for a
+specific conversation.
+
+User: I did the demo, but I don't know how Live would really be used in real life.
+
+User: The Pipeline, I guess it's a sales pipeline or chat pipeline. I don't know.
+
+User: It's a little hard to understand. I understand most of it, but I'd need to spend
+more time with it to understand more.
+
+Proctor: Would you use something like this at work, and for what?
+
+User: Yeah, sure. If you're a salesperson or in marketing, you could capture and
+analyze your conversations, or your salespeople's conversations, and improve their
+interactions with customers.

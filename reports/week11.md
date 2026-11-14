@@ -15,31 +15,61 @@
 
 ## 1. Shipped This Week
 
+- Ran one moderated usability session covering five app tasks. The
+  [cleaned transcript](../user_evidence/week11_user_testing_transcript.txt) is in `user_evidence/`.
 
 
 ## 2. User / Validation Learning
 
+- The participant could use high lead percentages to identify likely buyers, but said nearly
+  every lead showed about 99%, making the scores less useful for prioritization.
+- In Conversation View, the participant noticed a buyer's price objection but was unsure how to
+  find the point where interest dropped.
+- In Analyze, the participant was unsure how to interpret the final score and its apparent
+  conflict with the negative analysis. They did see value in analyzing another captured
+  conversation and its turning points.
+- Insights' empty “What hurts” section was confusing without context about what the results
+  represent. The participant also did not understand how Live would fit into an actual sales call
+  or how the demo call was selected.
+- The participant saw potential value for sales and marketing teams reviewing conversations to
+  improve customer interactions. Treat these as observations from one session, not validated
+  general conclusions.
 
 
 ## 3. Metrics Snapshot
 
+- Qualitative usability sessions: 1; tasks attempted: 5.
+- No quantitative completion, timing, or success-rate measures were collected.
+- The participant reported slow page loading and difficulty scrolling.
 
 
 ## 4. Challenges / Blockers
 
+- Clarify score meaning and direction, especially how the final score relates to the analysis.
+- Make the empty “What hurts” state and the scope of Insights understandable.
+- Explain the Live workflow and distinguish a demo call from a user's own live conversation.
+- Investigate the reported slowness and scrolling difficulty.
 
 
 ## 5. Next Week's Goals
 
+- Review score labels and explanations so users can interpret likelihood and turn-by-turn changes.
+- Add clearer context for Insights, including when there are no “What hurts” results.
+- Make the Live entry point, demo behavior, and intended real-call workflow explicit.
+- Reproduce and measure the reported page-load and scrolling delays.
+- Run additional usability sessions before treating these observations as representative.
 
 
 ## 6. Individual Contributions
 
 ### Taner Bulbul
 
-**Contributions:**
+**Contributions:** Conducted the user-testing session, prepared and archived the cleaned
+transcript, and documented the findings, usability challenges, and follow-up goals in the
+Week 11 report.
 
-**GitHub Evidence:**
+**GitHub Evidence:** [Week 11 report](week11.md) and
+[cleaned transcript](../user_evidence/week11_user_testing_transcript.txt).
 
 ### Ayesha Khan
 
@@ -78,3 +108,5 @@
 **Key Metrics:**
 
 **Changes Since Last Week:**
+
+No canvas changes made based on this single usability session; follow up with additional users.
