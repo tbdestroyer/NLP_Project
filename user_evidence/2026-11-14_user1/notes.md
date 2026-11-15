@@ -1,7 +1,6 @@
 # Session notes
 
-These notes were reconstructed from the cleaned transcript after the session, not recorded
-during it.
+These notes were reconstructed from the cleaned transcript after the session which was generated during the recording of the session.
 
 - **Date and time:** 2026-11-14
 - **Participant:** user1, outside the project team
