@@ -12,6 +12,7 @@ Analyze scores an uploaded chat with a trained model through the same data serve
 | Insights | Helpful/harmful agent moves, timing tabs, confidence ranges, data table and transcript examples |
 | Annotate | Focused sample labelling queue with keyboard shortcuts; writes to the same `annotation/labels/<name>.jsonl` files as Streamlit |
 | Analyze | **One conversation:** upload or paste a chat (text, CSV or JSON), mark the speakers, pick the kind of conversation, and see its score curve, turning points and status from a trained model. **Many conversations:** upload several files (or one file with many chats) and get a ranked lead list (CSV download), script insights and customer signals across the batch, and open any chat for its full detail |
+| Help | Brief getting-started guide, explanations of scores and lead statuses, and a searchable project glossary. Open it from the question-mark button or the menu. |
 
 ## Run it
 

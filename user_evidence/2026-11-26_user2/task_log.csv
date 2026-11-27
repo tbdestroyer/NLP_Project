@@ -1,0 +1,6 @@
+session_date,participant_id,product_version,task_id,completed,seconds_to_complete,errors_or_confusion,quotes_or_notes
+2026-11-26,user2,current running build; exact SHA unknown,T1,,,Partial: selected high/Hot scores but could not explain meaning,Video anchor 01:00; 906/951 Hot; 99% on cards (not task time)
+2026-11-26,user2,current running build; exact SHA unknown,T2,,,"Partial: reported slow clicks, pointed at a turn; exact correctness not established","Video anchor 01:40; buyer turn 3, −12 points; no threshold-defined turning point (not task time)"
+2026-11-26,user2,current running build; exact SHA unknown,T3,,,Not completed; repeated task prompt and protocol discussion; participant gave up,Video anchor 03:30; form populated; no result established (not task time)
+2026-11-26,user2,current running build; exact SHA unknown,T4,,,"Partial: named rapport, guessed discount unhelpful; chart values unclear; What hurts empty",Video anchor 04:15; no harmful moves displayed (not task time)
+2026-11-26,user2,current running build; exact SHA unknown,T5,,,Qualitative response; no formal success criterion; described cooling then recovery,Video anchor 06:15; demo transcript/coaching panel; no real sales call (not task time)

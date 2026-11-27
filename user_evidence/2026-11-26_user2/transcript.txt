@@ -1,0 +1,37 @@
+User 2 — 2026-11-26
+Edited transcript (not verbatim): profanity and repeated filler removed; confusion, negative feedback, and facilitator interventions retained. Speaker attribution reconstructed from the supplied text. Unclear audio/transcription passages omitted rather than guessed. Refer to the original recording for exact wording.
+
+Researcher: Thanks for helping. This is a tool for sales managers. I'll give you a few short tasks. We're testing the app, not you, so there are no wrong answers. Please think out loud as you go. I can't help during the tasks, but you can ask questions at the end.
+
+T1 — Prioritize leads
+Researcher: Find three leads most likely to buy and tell me why each one looks good.
+User: I can't ask questions, but here's the leads. Is that it? I'd pick these things.
+Researcher: Tell me why each one looks good.
+User: Because it's under Hot and has 99%, but I don't know what that means.
+
+T2 — Identify a drop
+Researcher: Open any conversation and show me the moment the customer started losing interest.
+User: I'm clicking. It's not working. This is slow. Right there. That turn.
+
+T3 — Score a new chat
+Researcher: Imagine you just finished a sales chat and use the app to tell me if the customer is likely to buy.
+[Researcher repeats the task; supplied text contains unclear fragments.]
+User: Why is this so vague? Can you just tell me where to go? How am I supposed to figure this out when this isn't working? I don't know what I'm doing. Can I read this? Where's the chat log? What am I supposed to read? Where am I writing it? You're not telling me.
+Researcher: I'm supposed to not tell you anything.
+User: Why?
+Researcher: Because we're supposed to test how the website is.
+User: Your website is bad.
+Researcher: I know. I didn't design it. We're trying to do the test. Just move on. If you say you don't know, we'll move on.
+User: I don't know.
+Researcher: Two more.
+
+T4 — Helpful and harmful sales moves
+Researcher: Which things a salesperson does seem to help the sale the most? What helps and what hurts?
+User: Builds rapport helps. I guess gives discount doesn't help. There are no figures to this graph, so it doesn't really mean much to me, but sure.
+
+T5 — Live demo
+Researcher: Watch this live sales call. Do you think this conversation is going well or cooling off?
+User: It goes up and down. The guy tells him bad news and he's like, oh, well, I guess I won't do it. Then he's like, but we've got this deal, don't worry. I guess it cooled off and then it got better.
+Researcher: Okay.
+
+Note: The supplied text indicates repeated prompting and a discussion of the no-help protocol during T3, ending with the task abandoned. The recording shows the Analyze form populated; who entered the text is not established from screen review. No formal task timers were captured in the supplied evidence. T5 was a live-demo interpretation, not a test of real call coaching.
