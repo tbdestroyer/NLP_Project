@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { HashRouter, Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { BarChart3, Menu, Moon, Radio, Sun, Users, WandSparkles, Workflow, X } from 'lucide-react';
+import { BarChart3, CircleHelp, Menu, Moon, Radio, Sun, Users, WandSparkles, Workflow, X } from 'lucide-react';
 import { DataGate, Mark, SelectionBar, SelectionProvider, useSelection } from './components/ui';
 import {
   Button, Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DropdownMenu,
@@ -9,6 +9,7 @@ import {
 const Analyze = lazy(() => import('./pages/Analyze'));
 const Annotate = lazy(() => import('./pages/Annotate'));
 const Conversation = lazy(() => import('./pages/Conversation'));
+const Help = lazy(() => import('./pages/Help'));
 const Insights = lazy(() => import('./pages/Insights'));
 const Leads = lazy(() => import('./pages/Leads'));
 const Live = lazy(() => import('./pages/Live'));
@@ -67,14 +68,20 @@ function TopBar({ theme, setTheme }) {
           <div className="ml-auto flex shrink-0 items-center gap-2.5">
             <div className="hidden xl:block"><SelectionBar /></div>
             <LiveStatus />
+            <Button asChild variant="outline" size="icon" className="hidden h-10 w-10 rounded-full bg-card/80 sm:inline-flex">
+              <Link to="/help" aria-label="Help" title="Help"><CircleHelp size={17} /></Link>
+            </Button>
             <ThemeToggle theme={theme} setTheme={setTheme} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Team tools menu" className="h-10 w-10 rounded-full bg-card/80">
+                <Button variant="outline" size="icon" aria-label="More menu" className="h-10 w-10 rounded-full bg-card/80">
                   <Menu size={17} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/help"><CircleHelp size={16} />Help</Link>
+                </DropdownMenuItem>
                 <div className="px-2.5 py-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Team tools</div>
                 <DropdownMenuItem asChild>
                   <Link to="/annotate"><WandSparkles size={16} />Annotate</Link>
@@ -137,6 +144,7 @@ function AppLayout({ theme, setTheme }) {
             <Route path="/" element={<Suspense fallback={<PageFallback />}><DataGate><Overview /></DataGate></Suspense>} />
             <Route path="/leads" element={<Suspense fallback={<PageFallback />}><DataGate><Leads /></DataGate></Suspense>} />
             <Route path="/insights" element={<Suspense fallback={<PageFallback />}><DataGate><Insights /></DataGate></Suspense>} />
+            <Route path="/help" element={<Suspense fallback={<PageFallback />}><Help /></Suspense>} />
             <Route path="/annotate" element={<Suspense fallback={<PageFallback />}><Annotate /></Suspense>} />
             <Route path="/analyze" element={<Suspense fallback={<PageFallback />}><Analyze /></Suspense>} />
             <Route path="/live" element={<Suspense fallback={<PageFallback />}><Live /></Suspense>} />
