@@ -58,3 +58,18 @@ user_evidence/YYYY-MM-DD_userN/
 | Date | Participant | Folder | Tasks completed |
 |---|---|---|---|
 | 2026-11-14 | user1 | [Session folder](2026-11-14_user1/) | Not established; see notes |
+| 2026-11-26 | user2 | [Session folder](2026-11-26_user2/) | T1, T2 and T4 partial; T3 not completed; T5 qualitative only |
+
+### user2 session
+
+An external participant tested the running web app using think-aloud tasks. The [notes](2026-11-26_user2/notes.md) and [task log](2026-11-26_user2/task_log.csv)
+were reconstructed from the recording and supplied transcript on 2026-11-27.
+
+- **T1:** Selected high-scoring Hot leads but did not understand the percentages or give individual reasons.
+- **T2:** Pointed to a score drop and reported slow clicks; correct turning-point identification was not established.
+- **T3:** Struggled to find where to enter and score a chat; the task was not completed.
+- **T4:** Identified rapport as helpful but did not identify a confirmed harmful move; the harmful-moves panel was empty and chart values were unclear.
+- **T5:** Described interest cooling and then recovering in the Live demo. This was an additional qualitative task, not a test of real-call coaching.
+
+The [session notes](2026-11-26_user2/notes.md) link the recording, transcript and screenshots.
+Screenshot timestamps are recording positions. Review the recording for personal information and consent before sharing, and verify the evidence commit date separately.
